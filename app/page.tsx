@@ -95,12 +95,12 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
       ctx.scale(width / 360, height / 470);
 
       const background = ctx.createLinearGradient(0, 0, 360, 470);
-      background.addColorStop(0, '#18396a');
-      background.addColorStop(1, '#091b3b');
+      background.addColorStop(0, '#0b1a33');
+      background.addColorStop(1, '#020816');
       ctx.fillStyle = background;
       ctx.fillRect(0, 0, 360, 470);
 
-      ctx.strokeStyle = 'rgba(111, 188, 220, .055)';
+      ctx.strokeStyle = 'rgba(163, 185, 208, .045)';
       ctx.lineWidth = 1;
       for (let i = -160; i < 520; i += 28) {
         ctx.beginPath();
@@ -109,7 +109,7 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(210, 230, 244, .13)';
+      ctx.strokeStyle = 'rgba(205, 218, 233, .09)';
       ctx.lineWidth = 17;
       ctx.lineCap = 'round';
       ctx.beginPath();
@@ -123,7 +123,7 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
       ctx.lineTo(342, 343);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(135, 175, 213, .22)';
+      ctx.fillStyle = 'rgba(98, 126, 164, .18)';
       ctx.beginPath();
       ctx.ellipse(180, 69, 84, 61, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -151,8 +151,8 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
       ];
 
       buildings.forEach((building) => {
-        ctx.fillStyle = 'rgba(117, 157, 199, .3)';
-        ctx.strokeStyle = 'rgba(182, 211, 235, .24)';
+        ctx.fillStyle = 'rgba(92, 119, 154, .24)';
+        ctx.strokeStyle = 'rgba(186, 203, 222, .19)';
         ctx.lineWidth = 1;
         drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
         ctx.fill();
@@ -168,8 +168,8 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
         }
       });
 
-      ctx.fillStyle = 'rgba(75, 112, 164, .28)';
-      ctx.strokeStyle = 'rgba(178, 206, 230, .18)';
+      ctx.fillStyle = 'rgba(60, 87, 127, .24)';
+      ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
       drawRoundedRect(ctx, 162, 130, 171, 169, 5);
       ctx.fill();
       ctx.stroke();
