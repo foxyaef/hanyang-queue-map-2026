@@ -370,7 +370,7 @@ export default function Home() {
             <span className="update-icon" aria-hidden="true">↻</span>
             <div>
               <p>마지막 업데이트</p>
-              <strong>{formatUpdatedAt(selected.updatedAt)}</strong>
+              <strong suppressHydrationWarning>{formatUpdatedAt(selected.updatedAt)}</strong>
             </div>
             <p>페이지를 새로고침하면<br />최신 현황을 불러옵니다.</p>
           </div>
