@@ -12,10 +12,6 @@ type QueueItem = {
   updatedAt: string;
 };
 
-type QueueApiResponse = {
-  queues: QueueItem[];
-};
-
 const categories: { id: CategoryId; label: string; caption: string }[] = [
   { id: 'wristband', label: '팔찌 수령', caption: 'WRISTBAND' },
   { id: 'entrance', label: '노천 입장', caption: 'ENTRANCE' },
@@ -78,15 +74,16 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const currentCanvas = canvas;
 
     function drawMap() {
       const ratio = window.devicePixelRatio || 1;
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      canvas.width = width * ratio;
-      canvas.height = height * ratio;
+      const width = currentCanvas.clientWidth;
+      const height = currentCanvas.clientHeight;
+      currentCanvas.width = width * ratio;
+      currentCanvas.height = height * ratio;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = currentCanvas.getContext('2d');
       if (!ctx) return;
 
       ctx.scale(ratio, ratio);
@@ -263,7 +260,7 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
 
     drawMap();
     const observer = new ResizeObserver(drawMap);
-    observer.observe(canvas);
+    observer.observe(currentCanvas);
     return () => observer.disconnect();
   }, [category, value]);
 
@@ -278,38 +275,7 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
 export default function Home() {
   const [category, setCategory] = useState<CategoryId>('wristband');
   const [selectedId, setSelectedId] = useState('wristband-1');
-  const [queues, setQueues] = useState<QueueItem[]>(sampleQueues);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSample, setIsSample] = useState(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function loadQueues() {
-      try {
-        const response = await fetch('/api/queues', {
-          cache: 'no-store',
-          headers: { Accept: 'application/json' },
-          signal: controller.signal,
-        });
-        if (!response.ok) throw new Error('queue api unavailable');
-        const data = await response.json() as QueueApiResponse;
-        if (!Array.isArray(data.queues) || data.queues.length === 0) throw new Error('invalid queue data');
-        setQueues(data.queues);
-        setIsSample(false);
-      } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
-          setQueues(sampleQueues);
-          setIsSample(true);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadQueues();
-    return () => controller.abort();
-  }, []);
+  const queues = sampleQueues;
 
   const locations = useMemo(() => queues.filter((queue) => queue.category === category), [category, queues]);
   const selected = queues.find((queue) => queue.id === selectedId) ?? locations[0] ?? sampleQueues[0];
@@ -328,7 +294,7 @@ export default function Home() {
           <div className="hero-pattern" aria-hidden="true" />
           <div className="eyebrow-row">
             <p>2026 애국한양응원제 · 오름</p>
-            <span>{isSample ? 'DESIGN PREVIEW' : 'LIVE'}</span>
+            <span>DESIGN PREVIEW</span>
           </div>
         </header>
 
@@ -373,7 +339,7 @@ export default function Home() {
             ))}
           </div>
 
-          <article className="queue-card" aria-busy={isLoading}>
+          <article className="queue-card">
             <div className="queue-card-head">
               <div>
                 <p>현재 대기 동선</p>
@@ -381,7 +347,7 @@ export default function Home() {
               </div>
               <div className={`status-pill ${status.tone}`}>
                 <i aria-hidden="true" />
-                {isLoading ? '불러오는 중' : status.short}
+                {status.short}
               </div>
             </div>
 
