@@ -125,28 +125,28 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
 
       ctx.fillStyle = 'rgba(98, 126, 164, .18)';
       ctx.beginPath();
-      ctx.ellipse(180, 69, 84, 61, 0, 0, Math.PI * 2);
+      ctx.ellipse(180, 61, 76, 49, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
       ctx.lineWidth = 3;
       for (let ring = 0; ring < 4; ring += 1) {
         ctx.beginPath();
-        ctx.ellipse(180, 69, 74 - ring * 9, 51 - ring * 6, 0, Math.PI, Math.PI * 2);
+        ctx.ellipse(180, 61, 67 - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
         ctx.stroke();
       }
       ctx.fillStyle = 'rgba(225, 239, 250, .82)';
       ctx.textAlign = 'center';
       ctx.font = '700 12px Arial, sans-serif';
-      ctx.fillText('노천극장', 180, 70);
+      ctx.fillText('노천극장', 180, 62);
       ctx.font = '500 9px Arial, sans-serif';
-      ctx.fillText('209동', 180, 84);
+      ctx.fillText('209동', 180, 76);
 
       const buildings = [
         { x: 12, y: 25, w: 54, h: 72, label: '역사관', sub: '구본관' },
         { x: 8, y: 151, w: 60, h: 76, label: '국제관', sub: '108동' },
-        { x: 92, y: 151, w: 55, h: 98, label: '박물관', sub: '109동' },
-        { x: 18, y: 279, w: 73, h: 62, label: '토건관', sub: '' },
-        { x: 164, y: 330, w: 169, h: 57, label: '신소재공학관', sub: '204동' },
+        { x: 101, y: 151, w: 37, h: 98, label: '박물관', sub: '109동' },
+        { x: 14, y: 279, w: 55, h: 62, label: '토건관', sub: '' },
+        { x: 164, y: 330, w: 165, h: 57, label: '신소재공학관', sub: '204동' },
         { x: 176, y: 412, w: 127, h: 46, label: '과학기술관', sub: '203동' },
       ];
 
@@ -170,7 +170,7 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
 
       ctx.fillStyle = 'rgba(60, 87, 127, .24)';
       ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
-      drawRoundedRect(ctx, 162, 130, 171, 169, 5);
+      drawRoundedRect(ctx, 164, 130, 165, 169, 5);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = 'rgba(216, 231, 244, .34)';
@@ -270,7 +270,6 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
   return (
     <div className="map-canvas-wrap" role="img" aria-label={`${locationName}의 현재 대기 동선, 전체 구간의 ${Math.round(value / 10)}퍼센트`}>
       <canvas ref={canvasRef} className="queue-map" />
-      <div className="map-compass" aria-hidden="true"><span>N</span><i /></div>
       <span className="map-place-label">한양대학교 서울캠퍼스</span>
     </div>
   );
