@@ -60,6 +60,12 @@ button { font: inherit; }
   transform: rotate(-14deg);
 }
 
+.hero::before,
+.hero::after,
+.hero-pattern {
+  display: none;
+}
+
 .hero::after {
   top: 25px;
   left: -88px;
@@ -747,6 +753,7 @@ body {
 
 .queue-meter span {
   border-radius: 0;
+  background: var(--festival-white);
 }
 
 .queue-label {
