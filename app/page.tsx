@@ -38,6 +38,7 @@ function formatUpdatedAt(iso: string) {
   if (Number.isNaN(date.getTime())) return '업데이트 시각 확인 불가';
 
   return new Intl.DateTimeFormat('ko-KR', {
+    timeZone: 'Asia/Seoul',
     month: 'numeric',
     day: 'numeric',
     hour: 'numeric',
