@@ -79,156 +79,192 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ratio = window.devicePixelRatio || 1;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    canvas.width = width * ratio;
-    canvas.height = height * ratio;
+    function drawMap() {
+      const ratio = window.devicePixelRatio || 1;
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    ctx.scale(ratio, ratio);
-    ctx.clearRect(0, 0, width, height);
+      ctx.scale(ratio, ratio);
+      ctx.clearRect(0, 0, width, height);
+      ctx.save();
+      ctx.scale(width / 360, height / 470);
 
-    const sx = width / 360;
-    const sy = height / 430;
-    ctx.save();
-    ctx.scale(sx, sy);
+      const background = ctx.createLinearGradient(0, 0, 360, 470);
+      background.addColorStop(0, '#18396a');
+      background.addColorStop(1, '#091b3b');
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, 360, 470);
 
-    const background = ctx.createLinearGradient(0, 0, 360, 430);
-    background.addColorStop(0, '#132b61');
-    background.addColorStop(1, '#091a3a');
-    ctx.fillStyle = background;
-    ctx.fillRect(0, 0, 360, 430);
-
-    ctx.strokeStyle = 'rgba(115, 211, 226, .07)';
-    ctx.lineWidth = 1;
-    for (let i = -120; i < 480; i += 34) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.bezierCurveTo(i + 70, 90, i - 40, 200, i + 72, 430);
-      ctx.stroke();
-    }
-
-    const buildings = [
-      { x: 30, y: 46, w: 82, h: 57, label: '국제관' },
-      { x: 126, y: 32, w: 105, h: 72, label: '노천극장' },
-      { x: 250, y: 54, w: 79, h: 52, label: '공연센터' },
-      { x: 31, y: 143, w: 69, h: 88, label: '박물관' },
-      { x: 119, y: 139, w: 116, h: 72, label: '신소재공학관' },
-      { x: 255, y: 138, w: 74, h: 92, label: '제2공학관' },
-      { x: 32, y: 270, w: 94, h: 65, label: '토건관' },
-      { x: 148, y: 262, w: 97, h: 83, label: '과학기술관' },
-      { x: 267, y: 271, w: 63, h: 63, label: '본관' },
-    ];
-
-    buildings.forEach((building, index) => {
-      ctx.fillStyle = index === 1 ? 'rgba(78, 122, 181, .62)' : 'rgba(76, 112, 166, .42)';
-      ctx.strokeStyle = 'rgba(137, 177, 220, .25)';
+      ctx.strokeStyle = 'rgba(111, 188, 220, .055)';
       ctx.lineWidth = 1;
-      drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(224, 238, 255, .72)';
-      ctx.textAlign = 'center';
-      ctx.font = '500 10px Arial, sans-serif';
-      ctx.fillText(building.label, building.x + building.w / 2, building.y + building.h / 2 + 3);
-    });
-
-    ctx.strokeStyle = 'rgba(172, 207, 232, .15)';
-    ctx.lineWidth = 18;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(16, 120);
-    ctx.bezierCurveTo(95, 120, 241, 117, 344, 124);
-    ctx.moveTo(137, 0);
-    ctx.bezierCurveTo(142, 120, 132, 294, 122, 430);
-    ctx.moveTo(247, 0);
-    ctx.bezierCurveTo(248, 112, 245, 301, 250, 430);
-    ctx.stroke();
-
-    const routes = category === 'wristband'
-      ? [
-          { x: 306, y: 389 }, { x: 270, y: 371 }, { x: 219, y: 376 }, { x: 164, y: 378 },
-          { x: 109, y: 366 }, { x: 84, y: 337 }, { x: 82, y: 291 }, { x: 105, y: 257 },
-          { x: 137, y: 237 }, { x: 151, y: 206 }, { x: 151, y: 174 }, { x: 167, y: 134 },
-        ]
-      : [
-          { x: 43, y: 389 }, { x: 56, y: 348 }, { x: 79, y: 320 }, { x: 106, y: 286 },
-          { x: 122, y: 247 }, { x: 150, y: 225 }, { x: 195, y: 224 }, { x: 232, y: 204 },
-          { x: 247, y: 174 }, { x: 246, y: 134 }, { x: 224, y: 111 }, { x: 201, y: 107 },
-        ];
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, .13)';
-    ctx.lineWidth = 10;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.setLineDash([1, 16]);
-    ctx.beginPath();
-    ctx.moveTo(routes[0].x, routes[0].y);
-    routes.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
-    ctx.stroke();
-
-    const lengths: number[] = [];
-    let total = 0;
-    for (let i = 1; i < routes.length; i += 1) {
-      const dx = routes[i].x - routes[i - 1].x;
-      const dy = routes[i].y - routes[i - 1].y;
-      const length = Math.hypot(dx, dy);
-      lengths.push(length);
-      total += length;
-    }
-
-    const activeLength = Math.max(16, total * Math.min(1000, Math.max(0, value)) / 1000);
-    ctx.strokeStyle = category === 'wristband' ? '#b579ff' : '#58ead1';
-    ctx.shadowColor = category === 'wristband' ? 'rgba(181, 121, 255, .75)' : 'rgba(88, 234, 209, .7)';
-    ctx.shadowBlur = 9;
-    ctx.lineWidth = 10;
-    ctx.setLineDash([1, 16]);
-    ctx.beginPath();
-    ctx.moveTo(routes[0].x, routes[0].y);
-
-    let walked = 0;
-    for (let i = 1; i < routes.length; i += 1) {
-      const segment = lengths[i - 1];
-      if (walked + segment <= activeLength) {
-        ctx.lineTo(routes[i].x, routes[i].y);
-        walked += segment;
-        continue;
+      for (let i = -160; i < 520; i += 28) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.bezierCurveTo(i + 90, 120, i - 45, 280, i + 88, 470);
+        ctx.stroke();
       }
 
-      const part = Math.max(0, (activeLength - walked) / segment);
-      ctx.lineTo(
-        routes[i - 1].x + (routes[i].x - routes[i - 1].x) * part,
-        routes[i - 1].y + (routes[i].y - routes[i - 1].y) * part,
-      );
-      break;
+      ctx.strokeStyle = 'rgba(210, 230, 244, .13)';
+      ctx.lineWidth = 17;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, 118);
+      ctx.bezierCurveTo(98, 128, 232, 111, 360, 120);
+      ctx.moveTo(88, 98);
+      ctx.bezierCurveTo(81, 190, 83, 312, 112, 470);
+      ctx.moveTo(151, 118);
+      ctx.bezierCurveTo(149, 244, 145, 350, 132, 470);
+      ctx.moveTo(342, 118);
+      ctx.lineTo(342, 343);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(135, 175, 213, .22)';
+      ctx.beginPath();
+      ctx.ellipse(180, 69, 84, 61, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
+      ctx.lineWidth = 3;
+      for (let ring = 0; ring < 4; ring += 1) {
+        ctx.beginPath();
+        ctx.ellipse(180, 69, 74 - ring * 9, 51 - ring * 6, 0, Math.PI, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(225, 239, 250, .82)';
+      ctx.textAlign = 'center';
+      ctx.font = '700 12px Arial, sans-serif';
+      ctx.fillText('노천극장', 180, 70);
+      ctx.font = '500 9px Arial, sans-serif';
+      ctx.fillText('209동', 180, 84);
+
+      const buildings = [
+        { x: 12, y: 25, w: 54, h: 72, label: '역사관', sub: '구본관' },
+        { x: 8, y: 151, w: 60, h: 76, label: '국제관', sub: '108동' },
+        { x: 92, y: 151, w: 55, h: 98, label: '박물관', sub: '109동' },
+        { x: 18, y: 279, w: 73, h: 62, label: '토건관', sub: '' },
+        { x: 164, y: 330, w: 169, h: 57, label: '신소재공학관', sub: '204동' },
+        { x: 176, y: 412, w: 127, h: 46, label: '과학기술관', sub: '203동' },
+      ];
+
+      buildings.forEach((building) => {
+        ctx.fillStyle = 'rgba(117, 157, 199, .3)';
+        ctx.strokeStyle = 'rgba(182, 211, 235, .24)';
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(230, 241, 250, .78)';
+        ctx.textAlign = 'center';
+        ctx.font = '600 9px Arial, sans-serif';
+        ctx.fillText(building.label, building.x + building.w / 2, building.y + building.h / 2 - (building.sub ? 2 : -3));
+        if (building.sub) {
+          ctx.fillStyle = 'rgba(207, 225, 240, .52)';
+          ctx.font = '500 8px Arial, sans-serif';
+          ctx.fillText(building.sub, building.x + building.w / 2, building.y + building.h / 2 + 10);
+        }
+      });
+
+      ctx.fillStyle = 'rgba(75, 112, 164, .28)';
+      ctx.strokeStyle = 'rgba(178, 206, 230, .18)';
+      drawRoundedRect(ctx, 162, 130, 171, 169, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(216, 231, 244, .34)';
+      ctx.font = '700 9px Arial, sans-serif';
+      ctx.fillText('주차장', 247, 218);
+
+      const routes = category === 'wristband'
+        ? [
+            { x: 205, y: 128 }, { x: 205, y: 154 }, { x: 250, y: 154 }, { x: 250, y: 128 },
+            { x: 330, y: 128 }, { x: 330, y: 292 }, { x: 160, y: 292 }, { x: 160, y: 202 },
+          ]
+        : [
+            { x: 83, y: 116 }, { x: 67, y: 116 }, { x: 67, y: 132 }, { x: 78, y: 132 },
+            { x: 78, y: 221 }, { x: 80, y: 288 }, { x: 91, y: 367 },
+          ];
+
+      const color = category === 'wristband' ? '#9b57e6' : '#27db80';
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = category === 'wristband' ? 'rgba(155, 87, 230, .22)' : 'rgba(39, 219, 128, .2)';
+      ctx.lineWidth = 5;
+      ctx.setLineDash([2, 9]);
+      ctx.beginPath();
+      ctx.moveTo(routes[0].x, routes[0].y);
+      routes.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const lengths: number[] = [];
+      let total = 0;
+      for (let i = 1; i < routes.length; i += 1) {
+        const length = Math.hypot(routes[i].x - routes[i - 1].x, routes[i].y - routes[i - 1].y);
+        lengths.push(length);
+        total += length;
+      }
+
+      const activeLength = total * Math.min(1000, Math.max(0, value)) / 1000;
+      let currentPoint = { ...routes[0] };
+
+      if (activeLength > 0) {
+        ctx.strokeStyle = color;
+        ctx.shadowColor = category === 'wristband' ? 'rgba(155, 87, 230, .6)' : 'rgba(39, 219, 128, .55)';
+        ctx.shadowBlur = 7;
+        ctx.lineWidth = 9;
+        ctx.beginPath();
+        ctx.moveTo(routes[0].x, routes[0].y);
+
+        let walked = 0;
+        for (let i = 1; i < routes.length; i += 1) {
+          const segment = lengths[i - 1];
+          if (walked + segment <= activeLength) {
+            ctx.lineTo(routes[i].x, routes[i].y);
+            currentPoint = { ...routes[i] };
+            walked += segment;
+            continue;
+          }
+
+          const part = Math.max(0, (activeLength - walked) / segment);
+          currentPoint = {
+            x: routes[i - 1].x + (routes[i].x - routes[i - 1].x) * part,
+            y: routes[i - 1].y + (routes[i].y - routes[i - 1].y) * part,
+          };
+          ctx.lineTo(currentPoint.x, currentPoint.y);
+          break;
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      const entry = routes[0];
+      ctx.fillStyle = '#f7fbff';
+      drawRoundedRect(ctx, entry.x - 24, entry.y - 14, 48, 28, 14);
+      ctx.fill();
+      ctx.fillStyle = '#0d244c';
+      ctx.font = '700 10px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(category === 'wristband' ? '수령' : '입장', entry.x, entry.y + 4);
+
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(currentPoint.x, currentPoint.y, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#f7fbff';
+      ctx.font = '700 10px Arial, sans-serif';
+      ctx.textAlign = currentPoint.x > 285 ? 'right' : 'left';
+      ctx.fillText('줄 끝', currentPoint.x > 285 ? currentPoint.x - 11 : currentPoint.x + 11, currentPoint.y + 4);
+
+      ctx.restore();
     }
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-    ctx.setLineDash([]);
 
-    const start = routes[0];
-    ctx.fillStyle = category === 'wristband' ? '#b579ff' : '#58ead1';
-    ctx.beginPath();
-    ctx.arc(start.x, start.y, 7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#f7fbff';
-    ctx.font = '700 10px Arial, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('줄 끝', start.x + 12, start.y + 4);
-
-    const end = routes[routes.length - 1];
-    ctx.fillStyle = '#f7fbff';
-    drawRoundedRect(ctx, end.x - 24, end.y - 14, 48, 28, 14);
-    ctx.fill();
-    ctx.fillStyle = '#0d244c';
-    ctx.font = '700 10px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(category === 'wristband' ? '수령' : '입장', end.x, end.y + 4);
-
-    ctx.restore();
+    drawMap();
+    const observer = new ResizeObserver(drawMap);
+    observer.observe(canvas);
+    return () => observer.disconnect();
   }, [category, value]);
 
   return (
@@ -295,8 +331,6 @@ export default function Home() {
             <p>2026 애국한양응원제 · 오름</p>
             <span>{isSample ? 'DESIGN PREVIEW' : 'LIVE'}</span>
           </div>
-          <h1>지금, <em>줄이 어디까지</em><br />왔을까요?</h1>
-          <p className="hero-copy">팔찌 수령과 노천극장 입장 대기 현황을<br />지도에서 바로 확인하세요.</p>
         </header>
 
         <div className="content-card">

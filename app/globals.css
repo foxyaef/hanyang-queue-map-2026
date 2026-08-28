@@ -34,9 +34,9 @@ button { font: inherit; }
 .hero {
   position: relative;
   isolation: isolate;
-  min-height: 286px;
+  min-height: 104px;
   overflow: hidden;
-  padding: 27px 24px 34px;
+  padding: 27px 24px 31px;
   color: #fff;
   background: linear-gradient(145deg, rgba(6, 18, 45, .8), rgba(1, 8, 22, .92)), radial-gradient(circle at 88% 72%, #173a71 0, transparent 41%), #050e21;
 }
@@ -53,7 +53,7 @@ button { font: inherit; }
 
 .hero::before {
   right: -82px;
-  bottom: -89px;
+  bottom: -192px;
   width: 280px;
   height: 245px;
   box-shadow: 0 0 0 14px rgba(94, 147, 201, .025), 0 0 0 30px rgba(94, 147, 201, .02), 0 0 0 48px rgba(94, 147, 201, .016);
@@ -61,7 +61,7 @@ button { font: inherit; }
 }
 
 .hero::after {
-  top: 82px;
+  top: 25px;
   left: -88px;
   width: 226px;
   height: 110px;
@@ -71,7 +71,7 @@ button { font: inherit; }
 .hero-pattern {
   position: absolute;
   right: -14px;
-  bottom: 22px;
+  bottom: -58px;
   z-index: -1;
   width: 170px;
   height: 170px;
@@ -85,7 +85,7 @@ button { font: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 38px;
+  margin-bottom: 0;
 }
 
 .eyebrow-row p,
@@ -103,25 +103,6 @@ button { font: inherit; }
   border-radius: 999px;
   color: #7cebd9;
   background: rgba(4, 14, 35, .6);
-}
-
-.hero h1 {
-  margin: 0;
-  color: #f8fbff;
-  font-family: 'KoPub Batang', 'Noto Serif KR', 'Batang', serif;
-  font-size: clamp(30px, 8.8vw, 39px);
-  font-weight: 700;
-  letter-spacing: -.065em;
-  line-height: 1.24;
-}
-
-.hero h1 em { color: #70ebd7; font-style: normal; }
-
-.hero-copy {
-  margin: 17px 0 0;
-  color: rgba(227, 236, 250, .65);
-  font-size: 13px;
-  line-height: 1.62;
 }
 
 .content-card {
@@ -302,7 +283,7 @@ button { font: inherit; }
 .map-canvas-wrap {
   position: relative;
   width: calc(100% - 18px);
-  aspect-ratio: 360 / 430;
+  aspect-ratio: 360 / 470;
   margin: 0 9px;
   overflow: hidden;
   border-radius: 13px;
