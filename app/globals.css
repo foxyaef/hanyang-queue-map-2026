@@ -1034,3 +1034,130 @@ button:focus-visible {
 @media (min-width: 561px) {
   .admin-shell { margin-block: 24px; }
 }
+
+.hero .admin-hero-signout {
+  position: absolute;
+  top: 58px;
+  right: 24px;
+  padding: 7px 9px;
+  border: 1px solid rgba(232, 235, 240, .13);
+  color: rgba(242, 242, 239, .68);
+  background: rgba(0, 3, 10, .72);
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.queue-summary.admin-editing {
+  grid-template-columns: 60px 1fr auto;
+}
+
+.queue-meter-slider {
+  width: 100%;
+  height: 28px;
+  margin: 0 0 -5px;
+  appearance: none;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+
+.queue-meter-slider::-webkit-slider-runnable-track {
+  height: 7px;
+  border: 1px solid rgba(231, 235, 240, .17);
+  background: linear-gradient(90deg, var(--festival-white) 0 var(--queue-progress), rgba(223, 230, 238, .12) var(--queue-progress) 100%);
+}
+
+.queue-meter-slider::-webkit-slider-thumb {
+  width: 25px;
+  height: 25px;
+  margin-top: -10px;
+  appearance: none;
+  border: 5px solid #071329;
+  border-radius: 50%;
+  background: var(--festival-white);
+  box-shadow: 0 0 0 1px rgba(243, 241, 236, .92), 0 3px 10px rgba(0, 0, 0, .45);
+}
+
+.queue-meter-slider::-moz-range-track {
+  height: 7px;
+  background: rgba(223, 230, 238, .12);
+}
+
+.queue-meter-slider::-moz-range-progress {
+  height: 7px;
+  background: var(--festival-white);
+}
+
+.queue-meter-slider::-moz-range-thumb {
+  width: 17px;
+  height: 17px;
+  border: 5px solid #071329;
+  border-radius: 50%;
+  background: var(--festival-white);
+}
+
+.map-admin-controls {
+  padding: 0 17px 17px;
+  border-top: 1px solid rgba(220, 228, 238, .09);
+}
+
+.map-entrance-state {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin-top: 16px;
+  background: rgba(218, 227, 238, .14);
+}
+
+.map-entrance-state button {
+  min-height: 42px;
+  border: 0;
+  color: rgba(207, 215, 225, .55);
+  background: #071329;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.map-entrance-state button.active {
+  color: #092339;
+  background: #a9e6d6;
+  font-weight: 800;
+}
+
+.map-entrance-state button.active.closed {
+  color: #3a1118;
+  background: #e5a6ad;
+}
+
+.map-save-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding-top: 15px;
+}
+
+.map-save-row p {
+  margin: 0;
+  color: rgba(185, 197, 213, .55);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.map-save-row button {
+  min-width: 88px;
+  min-height: 39px;
+  border: 1px solid var(--festival-white);
+  color: #091a33;
+  background: var(--festival-white);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.map-save-row button:disabled {
+  border-color: rgba(218, 227, 238, .13);
+  color: rgba(192, 203, 216, .4);
+  background: rgba(7, 18, 37, .5);
+  cursor: default;
+}
