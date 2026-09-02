@@ -18,7 +18,7 @@
     {
       "binding": "DB",
       "database_name": "hanyang-queue-db",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "ff3c57ce-c9b4-4fdf-84b5-a5cfba741466",
       "migrations_dir": "migrations"
     }
   ]
