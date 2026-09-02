@@ -8,8 +8,17 @@ type QueueItem = {
   id: string;
   category: CategoryId;
   name: string;
-  value: number;
+  displayOrder: number;
+  queueValue: number;
+  operatingStart: string | null;
+  operatingEnd: string | null;
+  isClosed: boolean;
   updatedAt: string;
+};
+
+type QueueApiResponse = {
+  serverTime: string;
+  queues: QueueItem[];
 };
 
 const categories: { id: CategoryId; label: string; caption: string }[] = [
@@ -18,19 +27,54 @@ const categories: { id: CategoryId; label: string; caption: string }[] = [
 ];
 
 const sampleQueues: QueueItem[] = [
-  { id: 'wristband-1', category: 'wristband', name: '수령처 1', value: 640, updatedAt: '2026-08-29T18:32:00+09:00' },
-  { id: 'wristband-2', category: 'wristband', name: '수령처 2', value: 360, updatedAt: '2026-08-29T18:28:00+09:00' },
-  { id: 'wristband-3', category: 'wristband', name: '수령처 3', value: 170, updatedAt: '2026-08-29T18:30:00+09:00' },
-  { id: 'entrance-1', category: 'entrance', name: '입장문 1', value: 780, updatedAt: '2026-08-29T18:31:00+09:00' },
-  { id: 'entrance-2', category: 'entrance', name: '입장문 2', value: 470, updatedAt: '2026-08-29T18:27:00+09:00' },
-  { id: 'entrance-3', category: 'entrance', name: '입장문 3', value: 90, updatedAt: '2026-08-29T18:29:00+09:00' },
+  { id: 'wristband-1', category: 'wristband', name: '수령처 1', displayOrder: 1, queueValue: 640, operatingStart: '2026-09-02T10:00:00+09:00', operatingEnd: '2026-09-02T20:00:00+09:00', isClosed: false, updatedAt: '2026-09-02T09:32:00+09:00' },
+  { id: 'wristband-2', category: 'wristband', name: '수령처 2', displayOrder: 2, queueValue: 360, operatingStart: '2026-09-02T10:00:00+09:00', operatingEnd: '2026-09-02T20:00:00+09:00', isClosed: false, updatedAt: '2026-09-02T09:28:00+09:00' },
+  { id: 'wristband-3', category: 'wristband', name: '수령처 3', displayOrder: 3, queueValue: 170, operatingStart: '2026-09-02T10:00:00+09:00', operatingEnd: '2026-09-02T20:00:00+09:00', isClosed: false, updatedAt: '2026-09-02T09:30:00+09:00' },
+  { id: 'entrance-1', category: 'entrance', name: '입장문 1', displayOrder: 1, queueValue: 780, operatingStart: null, operatingEnd: null, isClosed: false, updatedAt: '2026-09-02T09:31:00+09:00' },
+  { id: 'entrance-2', category: 'entrance', name: '입장문 2', displayOrder: 2, queueValue: 470, operatingStart: null, operatingEnd: null, isClosed: false, updatedAt: '2026-09-02T09:27:00+09:00' },
+  { id: 'entrance-3', category: 'entrance', name: '입장문 3', displayOrder: 3, queueValue: 90, operatingStart: null, operatingEnd: null, isClosed: false, updatedAt: '2026-09-02T09:29:00+09:00' },
 ];
 
-function queueStatus(value: number) {
-  if (value >= 750) return { label: '대기 매우 많음', short: '매우 많음', tone: 'busy' };
-  if (value >= 500) return { label: '대기 많음', short: '많음', tone: 'high' };
-  if (value >= 250) return { label: '대기 보통', short: '보통', tone: 'medium' };
-  return { label: '대기 원활', short: '원활', tone: 'low' };
+const sampleServerTime = '2026-09-02T09:32:00+09:00';
+const apiBaseUrl = process.env.NEXT_PUBLIC_QUEUE_API_URL?.replace(/\/$/, '') ?? '';
+
+function queueStatus(queue: QueueItem, serverTime: string) {
+  if (queue.category === 'entrance' && queue.isClosed) {
+    return { label: '입장이 마감되었습니다', short: '입장 마감', tone: 'closed', showQueue: false };
+  }
+
+  if (queue.category === 'wristband') {
+    if (!queue.operatingStart || !queue.operatingEnd) {
+      return { label: '운영시간을 확인하고 있습니다', short: '시간 미설정', tone: 'schedule', showQueue: false };
+    }
+
+    const now = Date.parse(serverTime);
+    const start = Date.parse(queue.operatingStart);
+    const end = Date.parse(queue.operatingEnd);
+    if (now < start) return { label: '아직 운영 전입니다', short: '운영 전', tone: 'pending', showQueue: false };
+    if (now >= end) return { label: '오늘 운영이 종료되었습니다', short: '운영 종료', tone: 'closed', showQueue: false };
+  }
+
+  if (queue.queueValue >= 750) return { label: '대기 매우 많음', short: '매우 많음', tone: 'busy', showQueue: true };
+  if (queue.queueValue >= 500) return { label: '대기 많음', short: '많음', tone: 'high', showQueue: true };
+  if (queue.queueValue >= 250) return { label: '대기 보통', short: '보통', tone: 'medium', showQueue: true };
+  return { label: '대기 원활', short: '원활', tone: 'low', showQueue: true };
+}
+
+function isQueueItem(value: unknown): value is QueueItem {
+  if (!value || typeof value !== 'object') return false;
+  const queue = value as Record<string, unknown>;
+  return typeof queue.id === 'string'
+    && (queue.category === 'wristband' || queue.category === 'entrance')
+    && typeof queue.name === 'string'
+    && Number.isInteger(queue.displayOrder)
+    && Number.isInteger(queue.queueValue)
+    && Number(queue.queueValue) >= 0
+    && Number(queue.queueValue) <= 1000
+    && (queue.operatingStart === null || typeof queue.operatingStart === 'string')
+    && (queue.operatingEnd === null || typeof queue.operatingEnd === 'string')
+    && typeof queue.isClosed === 'boolean'
+    && typeof queue.updatedAt === 'string';
 }
 
 function formatUpdatedAt(iso: string) {
@@ -69,7 +113,7 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
-function QueueMap({ value, category, locationName }: { value: number; category: CategoryId; locationName: string }) {
+function QueueMap({ value, category, locationName, overlayText }: { value: number; category: CategoryId; locationName: string; overlayText?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -269,6 +313,7 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
     <div className="map-canvas-wrap" role="img" aria-label={`${locationName}의 현재 대기 동선, 전체 구간의 ${Math.round(value / 10)}퍼센트`}>
       <canvas ref={canvasRef} className="queue-map" />
       <span className="map-place-label">한양대학교 서울캠퍼스</span>
+      {overlayText && <div className="map-status-overlay"><strong>{overlayText}</strong><span>현재 대기 동선 표시가 중지되었습니다.</span></div>}
     </div>
   );
 }
@@ -276,11 +321,48 @@ function QueueMap({ value, category, locationName }: { value: number; category: 
 export default function Home() {
   const [category, setCategory] = useState<CategoryId>('wristband');
   const [selectedId, setSelectedId] = useState('wristband-1');
-  const queues = sampleQueues;
+  const [queues, setQueues] = useState<QueueItem[]>(sampleQueues);
+  const [serverTime, setServerTime] = useState(sampleServerTime);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadQueues() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/v1/queues`, {
+          cache: 'no-store',
+          headers: { Accept: 'application/json' },
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error('queue api unavailable');
+
+        const data = await response.json() as QueueApiResponse;
+        if (!Array.isArray(data.queues) || data.queues.length !== 6 || !data.queues.every(isQueueItem)) {
+          throw new Error('invalid queue response');
+        }
+        if (Number.isNaN(Date.parse(data.serverTime))) throw new Error('invalid server time');
+
+        setQueues([...data.queues].sort((a, b) => a.displayOrder - b.displayOrder));
+        setServerTime(data.serverTime);
+        setLoadError(false);
+      } catch (error) {
+        if ((error as Error).name !== 'AbortError') {
+          setLoadError(true);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadQueues();
+    return () => controller.abort();
+  }, []);
 
   const locations = useMemo(() => queues.filter((queue) => queue.category === category), [category, queues]);
   const selected = queues.find((queue) => queue.id === selectedId) ?? locations[0] ?? sampleQueues[0];
-  const status = queueStatus(selected.value);
+  const status = queueStatus(selected, serverTime);
 
   function changeCategory(nextCategory: CategoryId) {
     setCategory(nextCategory);
@@ -295,7 +377,7 @@ export default function Home() {
           <div className="hero-pattern" aria-hidden="true" />
           <div className="eyebrow-row">
             <p>2026 애국한양응원제 · 오름</p>
-            <span>DESIGN PREVIEW</span>
+            <span>{isLoading ? 'CONNECTING' : loadError ? 'OFFLINE PREVIEW' : 'LIVE'}</span>
           </div>
         </header>
 
@@ -340,7 +422,7 @@ export default function Home() {
             ))}
           </div>
 
-          <article className="queue-card">
+          <article className="queue-card" aria-busy={isLoading}>
             <div className="queue-card-head">
               <div>
                 <p>현재 대기 동선</p>
@@ -348,19 +430,24 @@ export default function Home() {
               </div>
               <div className={`status-pill ${status.tone}`}>
                 <i aria-hidden="true" />
-                {status.short}
+                {isLoading ? '불러오는 중' : status.short}
               </div>
             </div>
 
-            <QueueMap value={selected.value} category={category} locationName={selected.name} />
+            <QueueMap
+              value={selected.queueValue}
+              category={category}
+              locationName={selected.name}
+              overlayText={!isLoading && !status.showQueue ? status.short : undefined}
+            />
 
             <div className="queue-summary">
               <div>
                 <p>현재 줄 길이</p>
-                <strong>{Math.round(selected.value / 10)}<span>%</span></strong>
+                <strong>{status.showQueue ? Math.round(selected.queueValue / 10) : '--'}<span>{status.showQueue ? '%' : ''}</span></strong>
               </div>
               <div className="queue-meter" aria-hidden="true">
-                <span style={{ width: `${selected.value / 10}%` }} />
+                <span style={{ width: `${status.showQueue ? selected.queueValue / 10 : 0}%` }} />
               </div>
               <p className="queue-label">{status.label}</p>
             </div>
@@ -375,9 +462,11 @@ export default function Home() {
             <p>페이지를 새로고침하면<br />최신 현황을 불러옵니다.</p>
           </div>
 
-          <aside className="notice">
+          <aside className={`notice${loadError ? ' error' : ''}`}>
             <span aria-hidden="true">!</span>
-            <p><strong>현장 상황에 따라 실제 대기 길이와 차이가 있을 수 있어요.</strong><br />안전요원의 안내를 우선으로 따라주세요.</p>
+            {loadError
+              ? <p><strong>최신 대기 현황을 불러오지 못했습니다.</strong><br />잠시 후 페이지를 새로고침해 주세요. 현재 화면은 미리보기 데이터입니다.</p>
+              : <p><strong>현장 상황에 따라 실제 대기 길이와 차이가 있을 수 있어요.</strong><br />안전요원의 안내를 우선으로 따라주세요.</p>}
           </aside>
 
           <footer>

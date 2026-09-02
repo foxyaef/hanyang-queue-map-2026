@@ -285,6 +285,9 @@ button { font: inherit; }
 .status-pill.high i { background: #f19052; box-shadow: 0 0 0 3px rgba(241, 144, 82, .16); }
 .status-pill.low { color: #167666; background: #e4faf6; }
 .status-pill.low i { background: #38cbb3; box-shadow: 0 0 0 3px rgba(56, 203, 179, .16); }
+.status-pill.closed i { background: #d66b72; box-shadow: 0 0 0 3px rgba(214, 107, 114, .16); }
+.status-pill.pending i,
+.status-pill.schedule i { background: #8998ad; box-shadow: 0 0 0 3px rgba(137, 152, 173, .16); }
 
 .map-canvas-wrap {
   position: relative;
@@ -310,6 +313,30 @@ button { font: inherit; }
   font-size: 9px;
   font-weight: 700;
   backdrop-filter: blur(8px);
+}
+
+.map-status-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #f5f2eb;
+  text-align: center;
+  background: rgba(0, 5, 15, .7);
+  backdrop-filter: blur(2px);
+}
+
+.map-status-overlay strong {
+  font-family: var(--festival-serif);
+  font-size: 24px;
+}
+
+.map-status-overlay span {
+  color: rgba(232, 236, 241, .58);
+  font-size: 10px;
 }
 
 .map-compass {
@@ -420,6 +447,9 @@ button { font: inherit; }
 
 .notice p { margin: 0; font-size: 10px; line-height: 1.5; }
 .notice strong { color: #40516b; }
+.notice.error { border-top-color: rgba(217, 105, 113, .28); }
+.notice.error span { border-color: rgba(217, 105, 113, .35); color: #f0b4b8; }
+.notice.error strong { color: #f0c2c4; }
 
 footer {
   display: flex;
