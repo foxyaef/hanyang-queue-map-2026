@@ -9,7 +9,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "backend:dev": "wrangler dev --config backend/wrangler.jsonc",
+    "backend:typecheck": "tsc -p backend/tsconfig.json --noEmit",
+    "backend:check": "wrangler deploy --dry-run --config backend/wrangler.jsonc --outdir dist",
+    "backend:db:local": "wrangler d1 migrations apply hanyang-queue-db --local --config backend/wrangler.jsonc",
+    "backend:db:remote": "wrangler d1 migrations apply hanyang-queue-db --remote --config backend/wrangler.jsonc",
+    "backend:deploy": "wrangler deploy --config backend/wrangler.jsonc"
   },
   "dependencies": {
     "next": "16.2.6",

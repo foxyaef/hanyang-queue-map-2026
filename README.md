@@ -4,6 +4,8 @@
 
 현재 버전은 GitHub Pages에서 동작하는 프론트엔드 디자인 시안이며 샘플 데이터를 사용합니다.
 
+운영용 백엔드는 `backend/`에 구현되어 있습니다. Cloudflare Worker가 정적 프론트엔드와 API를 함께 제공하고, 대기 상태는 D1에 저장합니다. 구축 및 배포 방법은 [backend/README.md](backend/README.md)를 참고하세요.
+
 ## 로컬 실행
 
 ```bash

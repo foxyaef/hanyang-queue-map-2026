@@ -1,0 +1,25 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "hanyang-queue-api-2026",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-05-22",
+  "observability": {
+    "enabled": true
+  },
+  "assets": {
+    "directory": "../out",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/health"]
+  },
+  "vars": {
+    "FRONTEND_ORIGIN": "https://foxyaef.github.io"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hanyang-queue-db",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
