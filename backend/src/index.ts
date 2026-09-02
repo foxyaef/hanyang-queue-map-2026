@@ -141,6 +141,14 @@ async function listQueues(request: Request, env: Env): Promise<Response> {
   });
 }
 
+async function listAdminQueues(request: Request, env: Env): Promise<Response> {
+  if (!(await isAuthorized(request, env))) {
+    return json(request, env, { error: 'UNAUTHORIZED' }, 401);
+  }
+
+  return listQueues(request, env);
+}
+
 async function updateQueue(
   request: Request,
   env: Env,
@@ -253,6 +261,10 @@ export default {
 
       if (request.method === 'GET' && url.pathname === '/api/v1/queues') {
         return listQueues(request, env);
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/v1/admin/queues') {
+        return listAdminQueues(request, env);
       }
 
       const adminQueueMatch = url.pathname.match(/^\/api\/v1\/admin\/queues\/([^/]+)$/);
