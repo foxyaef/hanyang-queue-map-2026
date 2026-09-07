@@ -62,8 +62,8 @@ export default function WristbandOneMap({ value, locationName, overlayText }: {
         <g aria-hidden="true">
           <circle cx="599" cy="661" r="28" className="campus-booth-halo" />
           <circle cx="599" cy="661" r="17" className="campus-booth-dot" />
-          <rect x="458" y="707" width="282" height="62" rx="5" className="campus-booth-plate" />
-          <text x="599" y="749" className="campus-booth-label">팔찌 부스 1 · 시작</text>
+          <rect x="520" y="707" width="158" height="62" rx="5" className="campus-booth-plate" />
+          <text x="599" y="749" className="campus-booth-label">수령처</text>
           {value > 0 && <>
             <circle cx={endX} cy={endY} r="18" className="campus-queue-end" />
           </>}

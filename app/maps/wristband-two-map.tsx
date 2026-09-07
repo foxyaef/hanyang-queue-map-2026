@@ -80,8 +80,8 @@ export default function WristbandTwoMap({ value, locationName, overlayText }: {
 
           <circle cx={boothX} cy={boothY} r="28" className="campus-booth-halo" />
           <circle cx={boothX} cy={boothY} r="17" className="campus-booth-dot" />
-          <rect x={boothX - 270} y={boothY + 47} width="282" height="62" rx="5" className="campus-booth-plate" />
-          <text x={boothX - 129} y={boothY + 89} className="campus-booth-label">팔찌 부스 2 · 시작</text>
+          <rect x={boothX - 146} y={boothY + 47} width="158" height="62" rx="5" className="campus-booth-plate" />
+          <text x={boothX - 67} y={boothY + 89} className="campus-booth-label">수령처</text>
           {end && <circle cx={end[0]} cy={end[1]} r="18" className="campus-queue-end" />}
         </g>
       </svg>
