@@ -1182,3 +1182,14 @@ button:focus-visible {
 .campus-key-planned { border-top: 3px dotted #9c85b7; }
 .campus-map-key i.campus-key-end { width: 9px; height: 9px; margin-inline: 4.5px; border: 2px solid #9866c9; border-radius: 50%; background: #f3ecff; }
 .campus-map-key i.campus-key-road { height: 7px; border: 1px solid var(--map-road-edge); background: var(--map-road); }
+
+/* 국제관 앞은 선을 연결하지 않는 통행 공간입니다. */
+.campus-landmark-dot { fill: #a2b2c4; }
+.campus-landmark-label { fill: #9eafc1; font-size: 30px; font-weight: 450; }
+.campus-station-marker { fill: #25443f; stroke: #7bab9a; stroke-width: 3; }
+.campus-station-number { fill: #c9e7dc; font-size: 38px; font-weight: 700; }
+.campus-passage-boundary { fill: none; stroke: #acd5ce; stroke-width: 6; stroke-linecap: round; }
+.campus-passage-pointer { fill: none; stroke: #acd5ce; stroke-width: 2; }
+.campus-passage-plate { fill: #142c32; stroke: #648f90; stroke-width: 2; }
+.campus-passage-label { fill: #c6e7df; font-size: 31px; font-weight: 600; text-anchor: middle; }
+.campus-passage-note { margin: 0; padding: 0 14px 14px; color: #b2c9c9; font-size: 12px; line-height: 1.65; text-align: center; }
