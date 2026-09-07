@@ -13,6 +13,11 @@ for (const ext of ['.ts', '.tsx']) {
 const { THREE_BUILDINGS, THREE_ROADS, WRISTBAND_THREE_ROUTE, THREE_BOOTH, THREE_RIGHT_CLEARANCE,
   THREE_THEATER_SEATING, THREE_THEATER_STAGE, THREE_THEATER_EAST_STAND } = require('../app/maps/wristband-three-layout.ts');
 const { filledRoute } = require('../app/maps/wristband-one-layout.ts');
+const entrance = process.argv.includes('--entrance');
+const { ENTRANCE_ONE_BUILDINGS, ENTRANCE_ONE_ROADS, ENTRANCE_ONE_ROUTE, ENTRANCE_ONE_GATE,
+  ENTRANCE_ONE_NORTH_BUILDING } = require('../app/maps/entrance-one-layout.ts');
+const route = entrance ? ENTRANCE_ONE_ROUTE : WRISTBAND_THREE_ROUTE;
+const booth = entrance ? ENTRANCE_ONE_GATE : THREE_BOOTH;
 
 function pointToSegment(p, a, b) {
   const dx = b[0] - a[0], dy = b[1] - a[1];
@@ -32,12 +37,13 @@ function contains(point, polygon) {
   }
   return inside;
 }
-const footprints = [...THREE_BUILDINGS, { id: 'theater', points: THREE_THEATER_SEATING },
-  { id: 'stage', points: THREE_THEATER_STAGE }, { id: 'east-stand', points: THREE_THEATER_EAST_STAND }];
+const footprints = [...(entrance ? ENTRANCE_ONE_BUILDINGS : THREE_BUILDINGS), { id: 'theater', points: THREE_THEATER_SEATING },
+  { id: 'stage', points: THREE_THEATER_STAGE }, { id: 'east-stand', points: THREE_THEATER_EAST_STAND },
+  ...(entrance ? [{ id: 'north-building', points: ENTRANCE_ONE_NORTH_BUILDING }] : [])];
 let clearance = Infinity;
 const collisions = [];
 for (const building of footprints) {
-  for (const road of [...THREE_ROADS, { id: 'queue', points: WRISTBAND_THREE_ROUTE, width: 20 }]) {
+  for (const road of [...(entrance ? ENTRANCE_ONE_ROADS : THREE_ROADS), { id: 'queue', points: route, width: 20 }]) {
     let nearest = Infinity;
     for (let i = 1; i < road.points.length; i++) {
       if (contains(road.points[i - 1], building.points) || contains(road.points[i], building.points)) nearest = 0;
@@ -53,11 +59,11 @@ for (const building of footprints) {
 assert.deepEqual(collisions, [], 'Buildings must clear roads and queue');
 
 function length(points) { return points.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - points[i][0], p[1] - points[i][1]), 0); }
-const total = length(WRISTBAND_THREE_ROUTE);
-assert.deepEqual(filledRoute(WRISTBAND_THREE_ROUTE, 0), [THREE_BOOTH]);
+const total = length(route);
+assert.deepEqual(filledRoute(route, 0), [booth]);
 for (let value = 0; value <= 1000; value++) {
-  const active = filledRoute(WRISTBAND_THREE_ROUTE, value);
-  assert.deepEqual(active[0], THREE_BOOTH, 'Queue must start at the booth');
+  const active = filledRoute(route, value);
+  assert.deepEqual(active[0], booth, 'Queue must start at the booth / gate');
   assert.ok(Math.abs(length(active) - total * value / 1000) < 1e-6, `Uneven growth at ${value}`);
 }
 assert.deepEqual(filledRoute(WRISTBAND_THREE_ROUTE, -10), filledRoute(WRISTBAND_THREE_ROUTE, 0));
@@ -65,6 +71,14 @@ assert.deepEqual(filledRoute(WRISTBAND_THREE_ROUTE, 1100), filledRoute(WRISTBAND
 for (const p of THREE_RIGHT_CLEARANCE) {
   const nearest = Math.min(...WRISTBAND_THREE_ROUTE.slice(1).map((end, i) => pointToSegment(p, WRISTBAND_THREE_ROUTE[i], end)));
   assert.ok(nearest > 40, 'Keep the right-hand entrance space separate from the wristband route');
+}
+if (entrance) {
+  for (let i = 1; i < route.length; i++) {
+    for (let j = 1; j < WRISTBAND_THREE_ROUTE.length; j++) {
+      assert.ok(segmentDistance(route[i - 1], route[i], WRISTBAND_THREE_ROUTE[j - 1], WRISTBAND_THREE_ROUTE[j]) > 28,
+        'Entrance and wristband queues must remain separate');
+    }
+  }
 }
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
@@ -74,6 +88,11 @@ for (const name of ['one', 'two', 'three']) {
   assert.match(markup, /class="campus-booth-label">수령처<\/text>/);
   assert.doesNotMatch(markup, /팔찌 부스 [123] · 시작/);
 }
+const EntranceMap = require('../app/maps/entrance-one-map.tsx').default;
+const entranceMarkup = renderToStaticMarkup(React.createElement(EntranceMap, { value: 500, locationName: '입장문 1', overlayText: '입장 마감' }));
+assert.match(entranceMarkup, /class="campus-booth-label">게이트<\/text>/);
+assert.match(entranceMarkup, /입장 마감/);
+assert.doesNotMatch(entranceMarkup, /class="campus-booth-label">수령처/);
 console.log(`PASS: ${footprints.length} footprints clear all roads and the queue (min ${clearance.toFixed(1)} units).`);
 console.log('PASS: all 1001 values grow from the booth; the right-hand entrance space stays clear.');
 console.log('PASS: all three booth markers use the label 수령처.');

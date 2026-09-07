@@ -5,6 +5,7 @@ import { QUEUE_STATUS_THRESHOLDS } from './queue-config';
 import WristbandOneMap from './maps/wristband-one-map';
 import WristbandTwoMap from './maps/wristband-two-map';
 import WristbandThreeMap from './maps/wristband-three-map';
+import EntranceOneMap from './maps/entrance-one-map';
 
 type CategoryId = 'wristband' | 'entrance';
 
@@ -391,7 +392,8 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
   ));
   const SelectedMap = selected.id === 'wristband-1' ? WristbandOneMap
     : selected.id === 'wristband-2' ? WristbandTwoMap
-    : selected.id === 'wristband-3' ? WristbandThreeMap : QueueMap;
+    : selected.id === 'wristband-3' ? WristbandThreeMap
+    : selected.id === 'entrance-1' ? EntranceOneMap : QueueMap;
 
   function changeCategory(nextCategory: CategoryId) {
     setCategory(nextCategory);
