@@ -6,6 +6,7 @@ import WristbandOneMap from './maps/wristband-one-map';
 import WristbandTwoMap from './maps/wristband-two-map';
 import WristbandThreeMap from './maps/wristband-three-map';
 import EntranceOneMap from './maps/entrance-one-map';
+import EntranceTwoMap from './maps/entrance-two-map';
 
 type CategoryId = 'wristband' | 'entrance';
 
@@ -393,7 +394,8 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
   const SelectedMap = selected.id === 'wristband-1' ? WristbandOneMap
     : selected.id === 'wristband-2' ? WristbandTwoMap
     : selected.id === 'wristband-3' ? WristbandThreeMap
-    : selected.id === 'entrance-1' ? EntranceOneMap : QueueMap;
+    : selected.id === 'entrance-1' ? EntranceOneMap
+    : selected.id === 'entrance-2' ? EntranceTwoMap : QueueMap;
 
   function changeCategory(nextCategory: CategoryId) {
     setCategory(nextCategory);

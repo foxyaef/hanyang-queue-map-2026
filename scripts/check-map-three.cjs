@@ -14,10 +14,13 @@ const { THREE_BUILDINGS, THREE_ROADS, WRISTBAND_THREE_ROUTE, THREE_BOOTH, THREE_
   THREE_THEATER_SEATING, THREE_THEATER_STAGE, THREE_THEATER_EAST_STAND } = require('../app/maps/wristband-three-layout.ts');
 const { filledRoute } = require('../app/maps/wristband-one-layout.ts');
 const entrance = process.argv.includes('--entrance');
+const entranceTwo = process.argv.includes('--entrance-two');
+const { ENTRANCE_TWO_BUILDINGS, ENTRANCE_TWO_ROUTE, ENTRANCE_TWO_GATE, ENTRANCE_TWO_VIEW } = require('../app/maps/entrance-two-layout.ts');
+const { MAP_ROADS, THEATER_SEATING, THEATER_STAGE, THEATER_EAST_STAND } = require('../app/maps/wristband-one-layout.ts');
 const { ENTRANCE_ONE_BUILDINGS, ENTRANCE_ONE_ROADS, ENTRANCE_ONE_ROUTE, ENTRANCE_ONE_GATE,
   ENTRANCE_ONE_NORTH_BUILDING } = require('../app/maps/entrance-one-layout.ts');
-const route = entrance ? ENTRANCE_ONE_ROUTE : WRISTBAND_THREE_ROUTE;
-const booth = entrance ? ENTRANCE_ONE_GATE : THREE_BOOTH;
+const route = entranceTwo ? ENTRANCE_TWO_ROUTE : entrance ? ENTRANCE_ONE_ROUTE : WRISTBAND_THREE_ROUTE;
+const booth = entranceTwo ? ENTRANCE_TWO_GATE : entrance ? ENTRANCE_ONE_GATE : THREE_BOOTH;
 
 function pointToSegment(p, a, b) {
   const dx = b[0] - a[0], dy = b[1] - a[1];
@@ -37,13 +40,14 @@ function contains(point, polygon) {
   }
   return inside;
 }
-const footprints = [...(entrance ? ENTRANCE_ONE_BUILDINGS : THREE_BUILDINGS), { id: 'theater', points: THREE_THEATER_SEATING },
+const footprints = entranceTwo ? [...ENTRANCE_TWO_BUILDINGS, { id: 'theater', points: THEATER_SEATING },
+  { id: 'stage', points: THEATER_STAGE }, { id: 'east-stand', points: THEATER_EAST_STAND }] : [...(entrance ? ENTRANCE_ONE_BUILDINGS : THREE_BUILDINGS), { id: 'theater', points: THREE_THEATER_SEATING },
   { id: 'stage', points: THREE_THEATER_STAGE }, { id: 'east-stand', points: THREE_THEATER_EAST_STAND },
   ...(entrance ? [{ id: 'north-building', points: ENTRANCE_ONE_NORTH_BUILDING }] : [])];
 let clearance = Infinity;
 const collisions = [];
 for (const building of footprints) {
-  for (const road of [...(entrance ? ENTRANCE_ONE_ROADS : THREE_ROADS), { id: 'queue', points: route, width: 20 }]) {
+  for (const road of [...(entranceTwo ? MAP_ROADS : entrance ? ENTRANCE_ONE_ROADS : THREE_ROADS), { id: 'queue', points: route, width: 20 }]) {
     let nearest = Infinity;
     for (let i = 1; i < road.points.length; i++) {
       if (contains(road.points[i - 1], building.points) || contains(road.points[i], building.points)) nearest = 0;
@@ -80,6 +84,15 @@ if (entrance) {
     }
   }
 }
+if (entranceTwo) {
+  assert.ok(booth[0] > route.at(-1)[0], 'Gate 2 must grow from right to left');
+  for (const p of route) {
+    assert.ok(p[0] > ENTRANCE_TWO_VIEW.left + 30 && p[0] < ENTRANCE_TWO_VIEW.left + ENTRANCE_TWO_VIEW.width - 30);
+    assert.ok(p[1] > ENTRANCE_TWO_VIEW.top + 30 && p[1] < ENTRANCE_TWO_VIEW.top + ENTRANCE_TWO_VIEW.height - 30);
+    assert.ok(MAP_ROADS.some((road) => road.points.slice(1).some((b, i) => pointToSegment(p, road.points[i], b) + 13 <= road.width / 2)),
+      'Gate 2 queue stroke must fit within the road');
+  }
+}
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
 for (const name of ['one', 'two', 'three']) {
@@ -93,6 +106,11 @@ const entranceMarkup = renderToStaticMarkup(React.createElement(EntranceMap, { v
 assert.match(entranceMarkup, /class="campus-booth-label">게이트<\/text>/);
 assert.match(entranceMarkup, /입장 마감/);
 assert.doesNotMatch(entranceMarkup, /class="campus-booth-label">수령처/);
+const EntranceTwoMap = require('../app/maps/entrance-two-map.tsx').default;
+const entranceTwoMarkup = renderToStaticMarkup(React.createElement(EntranceTwoMap, { value: 500, locationName: '입장문 2', overlayText: '입장 마감' }));
+assert.match(entranceTwoMarkup, /class="campus-booth-label">게이트<\/text>/);
+assert.match(entranceTwoMarkup, /입장 마감/);
+assert.match(entranceTwoMarkup, /역사관/);
 console.log(`PASS: ${footprints.length} footprints clear all roads and the queue (min ${clearance.toFixed(1)} units).`);
 console.log('PASS: all 1001 values grow from the booth; the right-hand entrance space stays clear.');
 console.log('PASS: all three booth markers use the label 수령처.');
