@@ -8,6 +8,8 @@ require.extensions['.ts'] = (module, filename) => {
 };
 const { TWO_BUILDINGS, TWO_ROADS, TWO_ROUTE_SECTIONS, TWO_CLEAR_PASSAGE, TWO_BOOTH,
   TWO_THEATER_SEATING, TWO_THEATER_STAGE, filledTwoSections, sectionLength } = require('../app/maps/wristband-two-layout.ts');
+const { ENTRANCE_THREE_ROADS, ENTRANCE_THREE_ROUTE, ENTRANCE_THREE_GATE } = require('../app/maps/entrance-three-layout.ts');
+const { filledRoute } = require('../app/maps/wristband-one-layout.ts');
 
 function pointToSegment(p, a, b) {
   const dx = b[0] - a[0], dy = b[1] - a[1];
@@ -31,7 +33,7 @@ const footprints = [...TWO_BUILDINGS, { id: 'theater', points: TWO_THEATER_SEATI
 let clearance = Infinity;
 const collisions = [];
 for (const building of footprints) {
-  for (const road of [...TWO_ROADS, ...TWO_ROUTE_SECTIONS.map((points, i) => ({ id: `queue-section-${i + 1}`, points, width: 20 }))]) {
+  for (const road of [...ENTRANCE_THREE_ROADS, ...TWO_ROUTE_SECTIONS.map((points, i) => ({ id: `queue-section-${i + 1}`, points, width: 20 }))]) {
     let nearest = Infinity;
     for (let i = 1; i < road.points.length; i++) {
       if (contains(road.points[i], building.points)) nearest = 0;
@@ -67,3 +69,19 @@ for (const [i, section] of filledTwoSections(1000).entries()) {
 }
 console.log(`PASS: ${footprints.length} footprints clear all roads and both queue sections (min ${clearance.toFixed(1)} units).`);
 console.log('PASS: 0–1000 uniform growth excludes the passage; even the full queue leaves it empty.');
+
+const entranceLength = sectionLength(ENTRANCE_THREE_ROUTE);
+assert.ok(ENTRANCE_THREE_GATE[1] < ENTRANCE_THREE_ROUTE.at(-1)[1], 'Gate 3 must grow southwards');
+for (let value = 0; value <= 1000; value++) {
+  const active = filledRoute(ENTRANCE_THREE_ROUTE, value);
+  assert.deepEqual(active[0], ENTRANCE_THREE_GATE);
+  assert.ok(Math.abs(sectionLength(active) - entranceLength * value / 1000) < 1e-6);
+  for (let i = 1; i < active.length; i++) assert.ok(active[i][1] >= active[i - 1][1], 'Gate 3 should remain continuous and go south');
+}
+for (let i = 1; i < ENTRANCE_THREE_ROUTE.length; i++) {
+  for (const section of TWO_ROUTE_SECTIONS) for (let j = 1; j < section.length; j++) {
+    assert.ok(segmentDistance(ENTRANCE_THREE_ROUTE[i - 1], ENTRANCE_THREE_ROUTE[i], section[j - 1], section[j]) > 28,
+      'Gate 3 and wristband 2 must stay separate');
+  }
+}
+console.log('PASS: gate 3 grows continuously southwards at all 1001 values, separate from wristband 2.');

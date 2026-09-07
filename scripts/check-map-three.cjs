@@ -111,6 +111,14 @@ const entranceTwoMarkup = renderToStaticMarkup(React.createElement(EntranceTwoMa
 assert.match(entranceTwoMarkup, /class="campus-booth-label">게이트<\/text>/);
 assert.match(entranceTwoMarkup, /입장 마감/);
 assert.match(entranceTwoMarkup, /역사관/);
+const EntranceThreeMap = require('../app/maps/entrance-three-map.tsx').default;
+for (const value of [0, 500, 1000]) {
+  const markup = renderToStaticMarkup(React.createElement(EntranceThreeMap, { value, locationName: '입장문 3', overlayText: '입장 마감' }));
+  assert.match(markup, /class="campus-booth-label">게이트<\/text>/);
+  assert.match(markup, /입장 마감/);
+  assert.equal((markup.match(/class="campus-route-planned"/g) || []).length, 1, 'Gate 3 must be a single continuous section');
+  assert.doesNotMatch(markup, /campus-passage-boundary|국제관 앞 통행 공간/);
+}
 console.log(`PASS: ${footprints.length} footprints clear all roads and the queue (min ${clearance.toFixed(1)} units).`);
 console.log('PASS: all 1001 values grow from the booth; the right-hand entrance space stays clear.');
 console.log('PASS: all three booth markers use the label 수령처.');
