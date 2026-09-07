@@ -114,7 +114,7 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
-function QueueMap({ value, category, locationName, overlayText }: { value: number; category: CategoryId; locationName: string; overlayText?: string }) {
+function QueueMap({ value, category, locationId, locationName, overlayText }: { value: number; category: CategoryId; locationId: string; locationName: string; overlayText?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -136,6 +136,7 @@ function QueueMap({ value, category, locationName, overlayText }: { value: numbe
       ctx.clearRect(0, 0, width, height);
       ctx.save();
       ctx.scale(width / 360, height / 470);
+      const isWristbandOne = locationId === 'wristband-1';
 
       const background = ctx.createLinearGradient(0, 0, 360, 470);
       background.addColorStop(0, '#0b1a33');
@@ -152,39 +153,61 @@ function QueueMap({ value, category, locationName, overlayText }: { value: numbe
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(205, 218, 233, .09)';
+      ctx.strokeStyle = 'rgba(205, 218, 233, .1)';
       ctx.lineWidth = 17;
       ctx.lineCap = 'round';
       ctx.beginPath();
-      ctx.moveTo(0, 118);
-      ctx.bezierCurveTo(98, 128, 232, 111, 360, 120);
-      ctx.moveTo(88, 98);
-      ctx.bezierCurveTo(81, 190, 83, 312, 112, 470);
-      ctx.moveTo(151, 118);
-      ctx.bezierCurveTo(149, 244, 145, 350, 132, 470);
-      ctx.moveTo(342, 118);
-      ctx.lineTo(342, 343);
+      if (isWristbandOne) {
+        ctx.moveTo(0, 123);
+        ctx.bezierCurveTo(88, 132, 236, 116, 360, 127);
+        ctx.moveTo(86, 104);
+        ctx.bezierCurveTo(78, 190, 82, 334, 72, 470);
+        ctx.moveTo(286, 125);
+        ctx.bezierCurveTo(299, 205, 294, 274, 310, 322);
+        ctx.moveTo(76, 294);
+        ctx.bezierCurveTo(170, 284, 267, 289, 360, 305);
+        ctx.moveTo(70, 452);
+        ctx.bezierCurveTo(168, 439, 245, 406, 360, 374);
+      } else {
+        ctx.moveTo(0, 118);
+        ctx.bezierCurveTo(98, 128, 232, 111, 360, 120);
+        ctx.moveTo(88, 98);
+        ctx.bezierCurveTo(81, 190, 83, 312, 112, 470);
+        ctx.moveTo(151, 118);
+        ctx.bezierCurveTo(149, 244, 145, 350, 132, 470);
+        ctx.moveTo(342, 118);
+        ctx.lineTo(342, 343);
+      }
       ctx.stroke();
 
       ctx.fillStyle = 'rgba(98, 126, 164, .18)';
       ctx.beginPath();
-      ctx.ellipse(180, 61, 76, 49, 0, 0, Math.PI * 2);
+      const stadiumX = isWristbandOne ? 133 : 180;
+      const stadiumY = isWristbandOne ? 61 : 61;
+      ctx.ellipse(stadiumX, stadiumY, isWristbandOne ? 91 : 76, 49, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
       ctx.lineWidth = 3;
       for (let ring = 0; ring < 4; ring += 1) {
         ctx.beginPath();
-        ctx.ellipse(180, 61, 67 - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
+        ctx.ellipse(stadiumX, stadiumY, (isWristbandOne ? 82 : 67) - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
         ctx.stroke();
       }
       ctx.fillStyle = 'rgba(225, 239, 250, .82)';
       ctx.textAlign = 'center';
       ctx.font = '700 12px Arial, sans-serif';
-      ctx.fillText('노천극장', 180, 62);
+      ctx.fillText('노천극장', stadiumX, stadiumY + 1);
       ctx.font = '500 9px Arial, sans-serif';
-      ctx.fillText('209동', 180, 76);
+      ctx.fillText('209동', stadiumX, stadiumY + 15);
 
-      const buildings = [
+      const buildings = isWristbandOne ? [
+        { x: 278, y: 20, w: 76, h: 83, label: '제2공학관', sub: '211동' },
+        { x: 11, y: 153, w: 61, h: 108, label: '박물관', sub: '109동' },
+        { x: 307, y: 151, w: 48, h: 133, label: '공업센터', sub: '206동' },
+        { x: 99, y: 309, w: 191, h: 60, label: '신소재공학관', sub: '204동' },
+        { x: 88, y: 388, w: 111, h: 64, label: '과학기술관', sub: '203동' },
+        { x: 17, y: 392, w: 57, h: 68, label: '건축관', sub: '202동' },
+      ] : [
         { x: 12, y: 25, w: 54, h: 72, label: '역사관', sub: '구본관' },
         { x: 8, y: 151, w: 60, h: 76, label: '국제관', sub: '108동' },
         { x: 101, y: 151, w: 37, h: 98, label: '박물관', sub: '109동' },
@@ -213,14 +236,22 @@ function QueueMap({ value, category, locationName, overlayText }: { value: numbe
 
       ctx.fillStyle = 'rgba(60, 87, 127, .24)';
       ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
-      drawRoundedRect(ctx, 164, 130, 165, 169, 5);
+      const parking = isWristbandOne
+        ? { x: 98, y: 145, w: 181, h: 137 }
+        : { x: 164, y: 130, w: 165, h: 169 };
+      drawRoundedRect(ctx, parking.x, parking.y, parking.w, parking.h, 5);
       ctx.fill();
       ctx.stroke();
       ctx.fillStyle = 'rgba(216, 231, 244, .34)';
       ctx.font = '700 9px Arial, sans-serif';
-      ctx.fillText('주차장', 247, 218);
+      ctx.fillText('주차장', parking.x + parking.w / 2, parking.y + parking.h / 2);
 
-      const routes = category === 'wristband'
+      const routes = isWristbandOne
+        ? [
+            { x: 200, y: 142 }, { x: 282, y: 142 }, { x: 282, y: 286 },
+            { x: 103, y: 286 }, { x: 62, y: 302 }, { x: 39, y: 350 }, { x: 39, y: 455 },
+          ]
+        : category === 'wristband'
         ? [
             { x: 205, y: 128 }, { x: 205, y: 154 }, { x: 250, y: 154 }, { x: 250, y: 128 },
             { x: 330, y: 128 }, { x: 330, y: 292 }, { x: 160, y: 292 }, { x: 160, y: 202 },
@@ -284,13 +315,34 @@ function QueueMap({ value, category, locationName, overlayText }: { value: numbe
       }
 
       const entry = routes[0];
-      ctx.fillStyle = '#f7fbff';
-      drawRoundedRect(ctx, entry.x - 24, entry.y - 14, 48, 28, 14);
-      ctx.fill();
-      ctx.fillStyle = '#0d244c';
-      ctx.font = '700 10px Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(category === 'wristband' ? '수령' : '입장', entry.x, entry.y + 4);
+      if (isWristbandOne) {
+        ctx.fillStyle = color;
+        ctx.shadowColor = 'rgba(155, 87, 230, .72)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(entry.x, entry.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#f7fbff';
+        ctx.beginPath();
+        ctx.arc(entry.x, entry.y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#f7fbff';
+        drawRoundedRect(ctx, entry.x - 32, entry.y - 34, 64, 18, 3);
+        ctx.fill();
+        ctx.fillStyle = '#0d244c';
+        ctx.font = '700 9px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('팔찌 부스 1', entry.x, entry.y - 22);
+      } else {
+        ctx.fillStyle = '#f7fbff';
+        drawRoundedRect(ctx, entry.x - 24, entry.y - 14, 48, 28, 14);
+        ctx.fill();
+        ctx.fillStyle = '#0d244c';
+        ctx.font = '700 10px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(category === 'wristband' ? '수령' : '입장', entry.x, entry.y + 4);
+      }
 
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -308,7 +360,7 @@ function QueueMap({ value, category, locationName, overlayText }: { value: numbe
     const observer = new ResizeObserver(drawMap);
     observer.observe(currentCanvas);
     return () => observer.disconnect();
-  }, [category, value]);
+  }, [category, locationId, value]);
 
   return (
     <div className="map-canvas-wrap" role="img" aria-label={`${locationName}의 현재 대기 동선`}>
@@ -501,6 +553,7 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
             <QueueMap
               value={selected.queueValue}
               category={category}
+              locationId={selected.id}
               locationName={selected.name}
               overlayText={!adminMode && !isLoading && !status.showQueue ? status.short : undefined}
             />
