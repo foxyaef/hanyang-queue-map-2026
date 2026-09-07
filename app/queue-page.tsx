@@ -171,31 +171,43 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
         ]);
         ctx.fill();
 
-        ctx.strokeStyle = 'rgba(218, 230, 241, .16)';
-        ctx.lineWidth = 20;
+        // Complete road network. The widest corridor is the actual queue route,
+        // so visitors can recognize every turn before reading the purple line.
+        ctx.strokeStyle = 'rgba(226, 236, 246, .13)';
+        ctx.lineWidth = 22;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.beginPath();
-        ctx.moveTo(-8, 126);
-        ctx.bezierCurveTo(67, 129, 206, 119, 284, 127);
-        ctx.bezierCurveTo(330, 132, 350, 128, 368, 120);
-        ctx.moveTo(84, 126);
-        ctx.bezierCurveTo(78, 185, 79, 248, 76, 284);
-        ctx.bezierCurveTo(73, 313, 56, 329, 43, 354);
-        ctx.lineTo(43, 476);
-        ctx.moveTo(289, 127);
-        ctx.bezierCurveTo(297, 185, 297, 245, 294, 286);
-        ctx.bezierCurveTo(292, 303, 307, 310, 368, 315);
-        ctx.moveTo(76, 292);
-        ctx.bezierCurveTo(139, 286, 232, 286, 294, 293);
-        ctx.moveTo(70, 463);
-        ctx.bezierCurveTo(143, 450, 187, 420, 226, 412);
-        ctx.bezierCurveTo(267, 402, 310, 390, 368, 366);
+        ctx.moveTo(-8, 139);
+        ctx.bezierCurveTo(74, 143, 111, 137, 198, 141);
+        ctx.moveTo(286, 141);
+        ctx.bezierCurveTo(318, 142, 343, 137, 368, 126);
+        ctx.moveTo(75, 139);
+        ctx.bezierCurveTo(76, 190, 74, 244, 69, 275);
+        ctx.moveTo(286, 290);
+        ctx.bezierCurveTo(313, 303, 337, 307, 368, 307);
+        ctx.moveTo(52, 478);
+        ctx.bezierCurveTo(132, 471, 175, 440, 226, 424);
+        ctx.bezierCurveTo(281, 407, 325, 389, 368, 366);
         ctx.stroke();
 
-        ctx.strokeStyle = 'rgba(238, 244, 250, .07)';
-        ctx.lineWidth = 1.2;
-        ctx.setLineDash([5, 7]);
+        const queueRoad = [
+          { x: 198, y: 141 }, { x: 286, y: 141 }, { x: 286, y: 290 },
+          { x: 103, y: 290 }, { x: 63, y: 304 }, { x: 40, y: 350 }, { x: 40, y: 476 },
+        ];
+        ctx.strokeStyle = 'rgba(190, 210, 230, .2)';
+        ctx.lineWidth = 34;
+        ctx.beginPath();
+        ctx.moveTo(queueRoad[0].x, queueRoad[0].y);
+        queueRoad.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(235, 242, 249, .13)';
+        ctx.lineWidth = 27;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(238, 244, 250, .075)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 7]);
         ctx.stroke();
         ctx.setLineDash([]);
 
@@ -228,28 +240,28 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
 
         const campusBuildings = [
           {
-            points: [{ x: 285, y: 17 }, { x: 350, y: 17 }, { x: 350, y: 104 }, { x: 323, y: 104 }, { x: 320, y: 67 }, { x: 286, y: 62 }],
-            label: '제2공학관', sub: '211동', tx: 320, ty: 49,
+            points: [{ x: 302, y: 18 }, { x: 352, y: 18 }, { x: 352, y: 105 }, { x: 318, y: 105 }, { x: 316, y: 64 }, { x: 302, y: 61 }],
+            label: '제2공학관', sub: '211동', tx: 328, ty: 50,
           },
           {
-            points: [{ x: 13, y: 147 }, { x: 65, y: 147 }, { x: 70, y: 194 }, { x: 61, y: 250 }, { x: 17, y: 263 }, { x: 10, y: 221 }],
-            label: '박물관', sub: '109동', tx: 40, ty: 202,
+            points: [{ x: 9, y: 169 }, { x: 61, y: 169 }, { x: 64, y: 207 }, { x: 58, y: 254 }, { x: 14, y: 263 }, { x: 9, y: 224 }],
+            label: '박물관', sub: '109동', tx: 36, ty: 211,
           },
           {
-            points: [{ x: 315, y: 146 }, { x: 360, y: 139 }, { x: 360, y: 291 }, { x: 320, y: 286 }, { x: 311, y: 225 }],
-            label: '공업센터', sub: '206동', tx: 337, ty: 217,
+            points: [{ x: 313, y: 161 }, { x: 360, y: 153 }, { x: 360, y: 286 }, { x: 316, y: 280 }, { x: 309, y: 221 }],
+            label: '공업센터', sub: '206동', tx: 337, ty: 218,
           },
           {
-            points: [{ x: 84, y: 318 }, { x: 118, y: 310 }, { x: 118, y: 299 }, { x: 225, y: 299 }, { x: 225, y: 307 }, { x: 287, y: 320 }, { x: 281, y: 366 }, { x: 94, y: 366 }],
-            label: '신소재공학관', sub: '204동', tx: 185, ty: 337,
+            points: [{ x: 91, y: 322 }, { x: 119, y: 315 }, { x: 226, y: 315 }, { x: 226, y: 321 }, { x: 273, y: 331 }, { x: 268, y: 367 }, { x: 96, y: 367 }],
+            label: '신소재공학관', sub: '204동', tx: 181, ty: 341,
           },
           {
-            points: [{ x: 79, y: 385 }, { x: 143, y: 379 }, { x: 183, y: 393 }, { x: 199, y: 430 }, { x: 166, y: 451 }, { x: 102, y: 449 }, { x: 78, y: 424 }],
-            label: '과학기술관', sub: '203동', tx: 138, ty: 415,
+            points: [{ x: 116, y: 392 }, { x: 158, y: 387 }, { x: 188, y: 399 }, { x: 198, y: 429 }, { x: 171, y: 448 }, { x: 121, y: 446 }, { x: 109, y: 421 }],
+            label: '과학기술관', sub: '203동', tx: 155, ty: 416,
           },
           {
-            points: [{ x: 10, y: 389 }, { x: 68, y: 386 }, { x: 70, y: 460 }, { x: 13, y: 465 }],
-            label: '건축관', sub: '202동', tx: 41, ty: 425,
+            points: [{ x: 60, y: 388 }, { x: 103, y: 388 }, { x: 105, y: 458 }, { x: 59, y: 461 }],
+            label: '건축관', sub: '202동', tx: 82, ty: 423,
           },
         ];
 
@@ -272,12 +284,12 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
         ctx.fillStyle = 'rgba(52, 82, 119, .3)';
         ctx.strokeStyle = 'rgba(190, 208, 226, .16)';
         ctx.lineWidth = 1;
-        drawRoundedRect(ctx, 91, 144, 192, 140, 7);
+        drawRoundedRect(ctx, 94, 158, 174, 117, 7);
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = 'rgba(222, 234, 244, .3)';
         ctx.font = '700 9px Arial, sans-serif';
-        ctx.fillText('P', 187, 218);
+        ctx.fillText('P', 181, 220);
 
         // Small landscape pockets visible around the southern buildings.
         ctx.fillStyle = 'rgba(43, 95, 115, .18)';
