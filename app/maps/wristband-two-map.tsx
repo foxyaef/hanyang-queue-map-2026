@@ -1,3 +1,5 @@
+import { type ReactNode } from 'react';
+import { type RouteData, renderedSections, fillSections } from '../../shared/route';
 import { filledRoute, pointsAttribute } from './wristband-one-layout';
 import { ENTRANCE_THREE_GATE, ENTRANCE_THREE_ROADS, ENTRANCE_THREE_ROUTE, ENTRANCE_THREE_VIEW } from './entrance-three-layout';
 import {
@@ -5,11 +7,11 @@ import {
   TWO_ROADS, TWO_ROUTE_SECTIONS, TWO_THEATER_SEATING, TWO_THEATER_STAGE, TWO_THEATER_TIERS,
 } from './wristband-two-layout';
 
-export default function WristbandTwoMap({ value, locationName, overlayText, entranceThree = false }: {
-  value: number; locationName: string; overlayText?: string; entranceThree?: boolean;
+export default function WristbandTwoMap({ value, locationName, overlayText, entranceThree = false, route: customRoute, children }: {
+  value: number; locationName: string; overlayText?: string; entranceThree?: boolean; route?: RouteData|null; children?: ReactNode;
 }) {
-  const sections = entranceThree ? [ENTRANCE_THREE_ROUTE] : TWO_ROUTE_SECTIONS;
-  const active = entranceThree ? [value > 0 ? filledRoute(ENTRANCE_THREE_ROUTE, value) : []] : filledTwoSections(value);
+  const sections = customRoute ? renderedSections(customRoute) : entranceThree ? [ENTRANCE_THREE_ROUTE] : TWO_ROUTE_SECTIONS;
+  const active = fillSections(sections,value);
   const view = entranceThree ? ENTRANCE_THREE_VIEW : { ...TWO_MAP_SIZE, top: 0 };
   const roads = entranceThree ? ENTRANCE_THREE_ROADS : TWO_ROADS;
   const buildings = entranceThree ? TWO_BUILDINGS.filter((b) => ['history', 'international', 'tokeon', 'museum', 'materials'].includes(b.id)) : TWO_BUILDINGS;
@@ -25,7 +27,7 @@ export default function WristbandTwoMap({ value, locationName, overlayText, entr
   return (
     <div className={`map-canvas-wrap campus-map-wrap ${entranceThree ? 'campus-entrance' : 'campus-wristband'}`}>
       <svg className={`campus-map ${entranceThree ? 'campus-entrance' : 'campus-wristband'}`} viewBox={`0 ${view.top} ${view.width} ${view.height}`} role="img"
-        aria-label={entranceThree
+        aria-label={customRoute ? `${locationName} 대기 지도. 관리자가 설정한 동선을 따라 수령처 또는 게이트부터 현재 줄 끝까지 표시합니다. 구간 사이 통행 공간은 연결하지 않습니다.` : entranceThree
           ? `${locationName} 대기 지도. 노천극장 왼쪽 게이트에서 박물관 왼쪽을 따라 남쪽으로 내려가며, 토건관 건너편의 박물관 남서쪽까지 이어지는 연속 대기 동선입니다.`
           : `${locationName} 대기 지도. 국제관 옆 팔찌 부스에서 북쪽으로 올라갔다가 애지문 쪽에서 꺾입니다. 국제관 앞 통행 공간은 항상 비워 두며, 그 건너편에서 토건관 방향으로 줄이 이어집니다.`}>
         <rect y={view.top} width={view.width} height={view.height} className="campus-ground" />
@@ -93,6 +95,7 @@ export default function WristbandTwoMap({ value, locationName, overlayText, entr
           <text x={markerX} y={markerY + (entranceThree ? 37 : 42)} className="campus-booth-label">{entranceThree ? '게이트' : '수령처'}</text>
           {end && <circle cx={end[0]} cy={end[1]} r="18" className="campus-queue-end" />}
         </g>
+        {children}
       </svg>
       <div className="campus-map-key" aria-label="지도 범례">
         <span><i className="campus-key-active" />현재 대기줄</span>

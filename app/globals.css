@@ -1207,3 +1207,38 @@ button:focus-visible {
 .campus-wristband .campus-key-active { border-top-color: #56d69a; }
 .campus-wristband .campus-key-planned { border-top-color: #6caa8b; }
 .campus-wristband .campus-map-key i.campus-key-end { border-color: #39b77c; background: #ebfff3; }
+
+/* 관리자 전용 동선 편집. 공개 화면의 지도·색상은 그대로 유지합니다. */
+.route-editor { border-top: 1px solid #344155; background: #0b1423; color: #edf2f8; }
+.route-editor button, .route-editor-entry button { min-height: 44px; padding: 9px 12px; border: 1px solid #59677b; border-radius: 5px; background: #162235; color: #f4f6fa; font: inherit; font-size: 14px; cursor: pointer; }
+.route-editor button:disabled, .route-editor-entry button:disabled { opacity: .4; cursor: not-allowed; }
+.route-editor button[aria-pressed="true"], .route-editor button.route-publish { background: #f2f4f8; color: #101a2a; }
+.route-editor button:focus-visible, .route-editor select:focus-visible, .route-control-point:focus-visible { outline: 3px solid #80c9ff; outline-offset: 3px; }
+.route-editor-entry { padding: 12px 16px; border-top: 1px solid #29364a; }
+.route-editor-entry p, .route-tools p, .route-history p { color: #b9c6d6; font-size: 14px; line-height: 1.65; margin: 8px 0; }
+.route-editor-heading { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 16px; }
+.route-editor-heading strong { display: block; font-size: 18px; }
+.route-editor-heading small { display: block; margin-top: 5px; font-size: 12px; color: #b9c6d6; }
+.route-tools { border: 0; margin: 0; padding: 12px 16px; min-width: 0; }
+.route-tool-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.route-tool-row > button { flex: 1 1 auto; }
+.route-tool-row label { display: flex; gap: 8px; align-items: center; flex: 1; font-size: 14px; }
+.route-editor select { min-height: 44px; min-width: 0; background: #162235; color: #fff; border: 1px solid #59677b; border-radius: 4px; padding: 6px; flex: 1; font: inherit; }
+.route-control-point { fill: #142235; stroke: #e5edf8; stroke-width: 5; cursor: grab; touch-action: none; }
+.route-control-point.selected { fill: #f6f8fc; stroke: #418abc; stroke-width: 7; }
+.route-control-point.fixed { fill: #8998ac; cursor: default; }
+.route-point-number { fill: #fff; text-anchor: middle; font: 700 18px sans-serif; }
+g:has(> .route-control-point.selected) > .route-point-number { fill: #122033; }
+.route-drawing .route-editor-overlay { touch-action: none; cursor: crosshair; }
+.route-editor-map .campus-map { user-select: none; }
+.route-range-label { display: grid; gap: 10px; font-size: 14px; margin: 16px 0; }
+.route-range-label input { width: 100%; accent-color: #fff; }
+.route-check { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; font-size: 14px; line-height: 1.6; }
+.route-check input { width: 20px; height: 20px; flex: 0 0 20px; accent-color: #fff; }
+.route-warning { border-left: 3px solid #e8c074; padding: 8px 12px; background: #302b21; }
+.route-warning p { color: #f0d7a8; }
+.route-history { border-top: 1px solid #3a485d; padding-top: 12px; }
+.route-history summary { cursor: pointer; padding: 12px 0; font-size: 14px; }
+.route-history button { width: 100%; margin: 4px 0; text-align: left; }
+.route-feedback { margin: 8px 16px; line-height: 1.7; font-size: 14px; overflow-wrap: anywhere; }
+.route-editor > button:last-child { margin: 8px 16px 20px; }

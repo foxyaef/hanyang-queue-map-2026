@@ -1,23 +1,26 @@
+import { type ReactNode } from 'react';
+import { type RouteData, renderedSections, fillSections } from '../../shared/route';
+import RouteLines from './route-lines';
 import {
   filledRoute, MAP_BUILDINGS, MAP_ROADS, MAP_SIZE, pointsAttribute,
   THEATER_EAST_STAND, THEATER_SEATING, THEATER_STAGE, THEATER_TIERS, WRISTBAND_ONE_ROUTE,
 } from './wristband-one-layout';
 import { ENTRANCE_TWO_BUILDINGS, ENTRANCE_TWO_GATE, ENTRANCE_TWO_ROUTE, ENTRANCE_TWO_VIEW } from './entrance-two-layout';
 
-export default function WristbandOneMap({ value, locationName, overlayText, entranceTwo = false }: {
-  value: number; locationName: string; overlayText?: string; entranceTwo?: boolean;
+export default function WristbandOneMap({ value, locationName, overlayText, entranceTwo = false, route: customRoute, children }: {
+  value: number; locationName: string; overlayText?: string; entranceTwo?: boolean; route?: RouteData|null; children?: ReactNode;
 }) {
   const route = entranceTwo ? ENTRANCE_TWO_ROUTE : WRISTBAND_ONE_ROUTE;
   const view = entranceTwo ? ENTRANCE_TWO_VIEW : { ...MAP_SIZE, left: 0, top: 0 };
   const buildings = entranceTwo ? ENTRANCE_TWO_BUILDINGS : MAP_BUILDINGS;
   const [boothX, boothY] = entranceTwo ? ENTRANCE_TWO_GATE : [599, 661];
-  const active = filledRoute(route, value);
-  const [endX, endY] = active[active.length - 1];
+  const sections = customRoute ? renderedSections(customRoute) : [route];
+  const [endX, endY] = fillSections(sections,value).flat().at(-1) ?? route[0];
 
   return (
     <div className={`map-canvas-wrap campus-map-wrap ${entranceTwo ? 'campus-entrance' : 'campus-wristband'}`}>
       <svg className={`campus-map ${entranceTwo ? 'campus-entrance' : 'campus-wristband'}`} viewBox={`${view.left} ${view.top} ${view.width} ${view.height}`} role="img"
-        aria-label={entranceTwo
+        aria-label={customRoute ? `${locationName} 대기 지도. 관리자가 설정한 동선을 따라 수령처 또는 게이트부터 현재 줄 끝까지 표시합니다.` : entranceTwo
           ? `${locationName} 대기 지도. 노천극장과 미래자동차 연구센터 사이 오른쪽 게이트에서, 노천극장 위쪽의 굽은 도로를 따라 왼쪽 역사관 방향으로 줄이 이어집니다. 노천극장과 아래 주차장 중심 지도입니다.`
           : `${locationName} 대기 지도. 노천극장 아래 주차장 안쪽의 팔찌 부스에서 오른쪽으로 이동한 후, 주차장 동쪽과 남쪽을 따라 신소재공학관 서쪽까지 이어지는 대기 동선.`}>
         <rect x={view.left} y={view.top} width={view.width} height={view.height} className="campus-ground" />
@@ -61,11 +64,7 @@ export default function WristbandOneMap({ value, locationName, overlayText, entr
           <text x="353" y="470" className="campus-theater-label">노천극장<tspan x="353" dy="47" className="campus-building-number">209동</tspan></text>
         </g>
 
-        <g fill="none" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <polyline className="campus-route-base" points={pointsAttribute(route)} />
-          <polyline className="campus-route-planned" points={pointsAttribute(route)} />
-          {value > 0 && <polyline className="campus-route-active" points={pointsAttribute(active)} />}
-        </g>
+        <RouteLines sections={sections} value={value}/>
         <g aria-hidden="true">
           <circle cx={boothX} cy={boothY} r="28" className="campus-booth-halo" />
           <circle cx={boothX} cy={boothY} r="17" className="campus-booth-dot" />
@@ -75,6 +74,7 @@ export default function WristbandOneMap({ value, locationName, overlayText, entr
             <circle cx={endX} cy={endY} r="18" className="campus-queue-end" />
           </>}
         </g>
+        {children}
       </svg>
       <div className="campus-map-key" aria-label="지도 범례">
         <span><i className="campus-key-active" />현재 대기줄</span>

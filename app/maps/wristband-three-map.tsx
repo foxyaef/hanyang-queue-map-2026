@@ -1,3 +1,6 @@
+import { type ReactNode } from 'react';
+import { type RouteData, renderedSections, fillSections } from '../../shared/route';
+import RouteLines from './route-lines';
 import { filledRoute, pointsAttribute } from './wristband-one-layout';
 import { ENTRANCE_ONE_BUILDINGS, ENTRANCE_ONE_GATE, ENTRANCE_ONE_NORTH_BUILDING, ENTRANCE_ONE_ROADS, ENTRANCE_ONE_ROUTE, ENTRANCE_ONE_VIEW } from './entrance-one-layout';
 import {
@@ -5,15 +8,15 @@ import {
   THREE_THEATER_EAST_STAND, THREE_THEATER_SEATING, THREE_THEATER_STAGE, THREE_THEATER_TIERS, WRISTBAND_THREE_ROUTE,
 } from './wristband-three-layout';
 
-export default function WristbandThreeMap({ value, locationName, overlayText, entrance = false }: {
-  value: number; locationName: string; overlayText?: string; entrance?: boolean;
+export default function WristbandThreeMap({ value, locationName, overlayText, entrance = false, route: customRoute, children }: {
+  value: number; locationName: string; overlayText?: string; entrance?: boolean; route?: RouteData|null; children?: ReactNode;
 }) {
   const route = entrance ? ENTRANCE_ONE_ROUTE : WRISTBAND_THREE_ROUTE;
   const roads = entrance ? ENTRANCE_ONE_ROADS : THREE_ROADS;
   const buildings = entrance ? ENTRANCE_ONE_BUILDINGS : THREE_BUILDINGS;
   const view = entrance ? ENTRANCE_ONE_VIEW : { ...THREE_MAP_SIZE, top: 0 };
-  const active = filledRoute(route, value);
-  const end = active.at(-1)!;
+  const sections = customRoute ? renderedSections(customRoute) : [route];
+  const end = fillSections(sections,value).flat().at(-1) ?? route[0];
   const [boothX, boothY] = entrance ? ENTRANCE_ONE_GATE : THREE_BOOTH;
   const markerX = entrance ? boothX + 114 : boothX;
   const markerY = entrance ? boothY + 50 : boothY + 43;
@@ -25,7 +28,7 @@ export default function WristbandThreeMap({ value, locationName, overlayText, en
   return (
     <div className={`map-canvas-wrap campus-map-wrap ${entrance ? 'campus-entrance' : 'campus-wristband'}`}>
       <svg className={`campus-map ${entrance ? 'campus-entrance' : 'campus-wristband'}`} viewBox={`0 ${view.top} ${view.width} ${view.height}`} role="img"
-        aria-label={entrance
+        aria-label={customRoute ? `${locationName} 대기 지도. 관리자가 설정한 동선을 따라 수령처 또는 게이트부터 현재 줄 끝까지 표시합니다.` : entrance
           ? `${locationName} 대기 지도. 노천극장과 미래자동차 연구센터 사이의 게이트에서 북쪽으로 올라가 제1공학관 아래를 따라 동쪽으로 돌고, 백남학술정보관 501동 옆을 지나 아워홈 푸드코트 방향까지 이어집니다. 팔찌 대기줄과 나란한 구간은 도로 오른쪽을 사용합니다.`
           : `${locationName} 대기 지도. 사회과학관 아래 수령처에서 본관 오른쪽으로 돌아 역사관 옆으로 이어집니다. 팔찌 줄은 역사관 쪽 도로 가장자리에 붙고, 오른쪽은 입장 대기 공간으로 남겨 둡니다.`}>
         <rect y={view.top} width={view.width} height={view.height} className="campus-ground" />
@@ -84,11 +87,7 @@ export default function WristbandThreeMap({ value, locationName, overlayText, en
           </text>}
         </g>
 
-        <g fill="none" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <polyline className="campus-route-base" points={pointsAttribute(route)} />
-          <polyline className="campus-route-planned" points={pointsAttribute(route)} />
-          {value > 0 && <polyline className="campus-route-active" points={pointsAttribute(active)} />}
-        </g>
+        <RouteLines sections={sections} value={value}/>
         <g aria-hidden="true">
           <circle cx={boothX} cy={boothY} r="28" className="campus-booth-halo" />
           <circle cx={boothX} cy={boothY} r="17" className="campus-booth-dot" />
@@ -97,6 +96,7 @@ export default function WristbandThreeMap({ value, locationName, overlayText, en
           <text x={markerX} y={markerY + 42} className="campus-booth-label">{entrance ? '게이트' : '수령처'}</text>
           {value > 0 && <circle cx={end[0]} cy={end[1]} r="18" className="campus-queue-end" />}
         </g>
+        {children}
       </svg>
       <div className="campus-map-key" aria-label="지도 범례">
         <span><i className="campus-key-active" />현재 대기줄</span>

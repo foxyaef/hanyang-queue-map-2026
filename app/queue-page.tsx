@@ -8,10 +8,12 @@ import WristbandThreeMap from './maps/wristband-three-map';
 import EntranceOneMap from './maps/entrance-one-map';
 import EntranceTwoMap from './maps/entrance-two-map';
 import EntranceThreeMap from './maps/entrance-three-map';
+import RouteEditor from './route-editor';
+import { type RouteData, validRoute } from '../shared/route';
 
 type CategoryId = 'wristband' | 'entrance';
 
-type QueueItem = {
+export type QueueItem = {
   id: string;
   category: CategoryId;
   name: string;
@@ -21,6 +23,8 @@ type QueueItem = {
   operatingEnd: string | null;
   isClosed: boolean;
   updatedAt: string;
+  route?: RouteData | null;
+  routeRevision?: number;
 };
 
 type QueueApiResponse = {
@@ -81,7 +85,9 @@ function isQueueItem(value: unknown): value is QueueItem {
     && (queue.operatingStart === null || typeof queue.operatingStart === 'string')
     && (queue.operatingEnd === null || typeof queue.operatingEnd === 'string')
     && typeof queue.isClosed === 'boolean'
-    && typeof queue.updatedAt === 'string';
+    && typeof queue.updatedAt === 'string'
+    && (queue.route == null || validRoute(queue.route))
+    && (queue.routeRevision === undefined || (Number.isInteger(queue.routeRevision) && Number(queue.routeRevision)>=0));
 }
 
 function formatUpdatedAt(iso: string) {
@@ -397,7 +403,14 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
     : selected.id === 'wristband-3' ? WristbandThreeMap
     : selected.id === 'entrance-1' ? EntranceOneMap
     : selected.id === 'entrance-2' ? EntranceTwoMap
-    : selected.id === 'entrance-3' ? EntranceThreeMap : QueueMap;
+    : EntranceThreeMap;
+
+  const [editingRoute,setEditingRoute]=useState(false);
+  function acceptQueue(queue:QueueItem) {
+    setQueues(items=>items.map(q=>q.id===queue.id?queue:q));
+    setSavedQueues(items=>items.map(q=>q.id===queue.id?queue:q));
+    setSaveMessage('저장된 최신 상태를 반영했습니다.');
+  }
 
   function changeCategory(nextCategory: CategoryId) {
     setCategory(nextCategory);
@@ -425,12 +438,13 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
           Authorization: `Bearer ${adminToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({...body,expectedRouteRevision:selected.routeRevision??0,expectedUpdatedAt:selected.updatedAt}),
       });
       if (response.status === 401) {
         onSignOut?.();
         throw new Error('관리자 인증이 만료되었습니다.');
       }
+      if(response.status===409) throw new Error('동선 또는 현황이 먼저 변경되었습니다. 페이지를 새로고침한 뒤 다시 맞춰 주세요.');
       if (!response.ok) throw new Error('변경사항을 저장하지 못했습니다.');
 
       const data = await response.json() as { queue: QueueItem | null };
@@ -454,7 +468,7 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
             <p>2026 애국한양응원제 · 오름</p>
             <span>{adminMode ? 'ADMIN' : isLoading ? 'CONNECTING' : loadError ? 'OFFLINE PREVIEW' : 'LIVE'}</span>
           </div>
-          {adminMode && <button type="button" className="admin-hero-signout" onClick={onSignOut}>로그아웃</button>}
+          {adminMode && <button type="button" disabled={editingRoute} className="admin-hero-signout" onClick={onSignOut}>로그아웃</button>}
         </header>
 
         <div className="content-card">
@@ -462,6 +476,7 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
             {categories.map((item) => (
               <button
                 key={item.id}
+                disabled={editingRoute}
                 type="button"
                 role="tab"
                 aria-selected={category === item.id}
@@ -486,6 +501,7 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
             {locations.map((location, index) => (
               <button
                 key={location.id}
+                disabled={editingRoute}
                 type="button"
                 role="tab"
                 aria-selected={selected.id === location.id}
@@ -510,10 +526,12 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
               </div>
             </div>
 
+            {editingRoute && adminToken ? <RouteEditor key={selected.id} queue={savedSelected??selected} token={adminToken} baseUrl={apiBaseUrl} Map={SelectedMap} onUpdated={acceptQueue} onClose={()=>setEditingRoute(false)}/> : <>
+            {adminMode&&<div className="route-editor-entry"><button type="button" disabled={isLoading||loadError||isSaving||hasChanges} onClick={()=>setEditingRoute(true)}>지도 동선 편집</button><p>{hasChanges?'대기 현황을 먼저 저장한 뒤 동선을 편집하세요.':'점 이동·구간 추가·이전 동선 복구'}</p></div>}
             <SelectedMap
               value={selected.queueValue}
-              category={category}
               locationName={selected.name}
+              route={selected.route}
               overlayText={!adminMode && !isLoading && !status.showQueue ? status.short : undefined}
             />
 
@@ -525,6 +543,7 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
                   min="0"
                   max="1000"
                   step="1"
+                  disabled={isLoading||loadError||isSaving}
                   value={selected.queueValue}
                   aria-label={`${selected.name} 대기열 길이`}
                   onChange={(event) => updateSelected({ queueValue: Number(event.target.value) })}
@@ -548,10 +567,11 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
                 )}
                 <div className="map-save-row">
                   <p>{saveMessage || (hasChanges ? '변경한 내용은 저장 전까지 사용자 화면에 반영되지 않습니다.' : '현재 DB에 저장된 상태입니다.')}</p>
-                  <button type="button" disabled={!hasChanges || isSaving} onClick={saveSelected}>{isSaving ? '저장 중…' : hasChanges ? '변경 저장' : '저장됨'}</button>
+                  <button type="button" disabled={!hasChanges || isSaving || loadError || isLoading} onClick={saveSelected}>{isSaving ? '저장 중…' : hasChanges ? '변경 저장' : '저장됨'}</button>
                 </div>
               </div>
             )}
+            </>}
           </article>
 
           <div className="update-row" role="status" aria-live="polite">
