@@ -71,6 +71,11 @@ console.log(`PASS: ${footprints.length} footprints clear all roads and both queu
 console.log('PASS: 0–1000 uniform growth excludes the passage; even the full queue leaves it empty.');
 
 const entranceLength = sectionLength(ENTRANCE_THREE_ROUTE);
+assert.deepEqual(ENTRANCE_THREE_ROADS, TWO_ROADS, 'Do not invent a road to fit gate 3');
+for (const p of ENTRANCE_THREE_ROUTE) {
+  assert.ok(TWO_ROADS.some((road) => road.points.slice(1).some((b, i) => pointToSegment(p, road.points[i], b) + 13 <= road.width / 2)),
+    `Gate 3 entire stroke must fit inside the original road at ${p}`);
+}
 assert.ok(ENTRANCE_THREE_GATE[1] < ENTRANCE_THREE_ROUTE.at(-1)[1], 'Gate 3 must grow southwards');
 for (let value = 0; value <= 1000; value++) {
   const active = filledRoute(ENTRANCE_THREE_ROUTE, value);

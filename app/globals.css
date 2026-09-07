@@ -1153,7 +1153,8 @@ button:focus-visible {
 .map-canvas-wrap.campus-map-wrap { aspect-ratio: auto; background: var(--map-land); }
 .campus-map { display: block; width: 100%; height: auto; font-family: var(--festival-sans); }
 .campus-ground { fill: var(--map-land); }
-.campus-landscape { fill: #15323b; }
+/* 모든 지도에서 잔디 장식은 표시하지 않습니다. */
+.campus-landscape { display: none; }
 .campus-road { stroke: var(--map-road); }
 .campus-road-edge { stroke: var(--map-road-edge); }
 .campus-parking { fill: #112338; stroke: #354d65; stroke-width: 3; }

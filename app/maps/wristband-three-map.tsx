@@ -68,8 +68,10 @@ export default function WristbandThreeMap({ value, locationName, overlayText, en
             <tspan x={building.label[0]} dy="42" className="campus-building-number">{building.number}</tspan>
           </text>)}
           <text x={theaterX} y={theaterY} className="campus-theater-label">노천극장<tspan x={theaterX} dy="47" className="campus-building-number">209동</tspan></text>
-          <circle cx={statueX} cy={statueY} r="11" className="campus-landmark-dot" />
-          <text x={statueX} y={statueY + 124} className="campus-landmark-label">백남 김연준<tspan x={statueX} dy="36">박사상</tspan></text>
+          {!entrance && <>
+            <circle cx={statueX} cy={statueY} r="11" className="campus-landmark-dot" />
+            <text x={statueX} y={statueY + 124} className="campus-landmark-label">백남 김연준<tspan x={statueX} dy="36">박사상</tspan></text>
+          </>}
           <circle cx={stationX} cy={stationY} r="29" className="campus-station-marker" />
           <text x={stationX} y={stationY + 13} className="campus-station-number">2</text>
           <text x={stationX} y={stationY - 94} className="campus-building-label">한양대역<tspan x={stationX} dy="39" className="campus-landmark-label">2번 출구</tspan></text>
