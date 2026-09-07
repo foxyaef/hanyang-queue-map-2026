@@ -114,6 +114,13 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
+function drawPolygon(ctx: CanvasRenderingContext2D, points: Array<{ x: number; y: number }>) {
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  points.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
+  ctx.closePath();
+}
+
 function QueueMap({ value, category, locationId, locationName, overlayText }: { value: number; category: CategoryId; locationId: string; locationName: string; overlayText?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -153,22 +160,135 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(205, 218, 233, .1)';
-      ctx.lineWidth = 17;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
       if (isWristbandOne) {
-        ctx.moveTo(0, 123);
-        ctx.bezierCurveTo(88, 132, 236, 116, 360, 127);
-        ctx.moveTo(86, 104);
-        ctx.bezierCurveTo(78, 190, 82, 334, 72, 470);
-        ctx.moveTo(286, 125);
-        ctx.bezierCurveTo(299, 205, 294, 274, 310, 322);
-        ctx.moveTo(76, 294);
-        ctx.bezierCurveTo(170, 284, 267, 289, 360, 305);
-        ctx.moveTo(70, 452);
-        ctx.bezierCurveTo(168, 439, 245, 406, 360, 374);
+        // Reference-map faithful campus ground plane: roads are drawn first so
+        // every building remains clearly inside its own block.
+        ctx.fillStyle = 'rgba(31, 66, 103, .2)';
+        drawPolygon(ctx, [
+          { x: 0, y: 0 }, { x: 360, y: 0 }, { x: 360, y: 470 },
+          { x: 286, y: 470 }, { x: 253, y: 443 }, { x: 220, y: 422 },
+          { x: 171, y: 430 }, { x: 111, y: 457 }, { x: 0, y: 470 },
+        ]);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(218, 230, 241, .16)';
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(-8, 126);
+        ctx.bezierCurveTo(67, 129, 206, 119, 284, 127);
+        ctx.bezierCurveTo(330, 132, 350, 128, 368, 120);
+        ctx.moveTo(84, 126);
+        ctx.bezierCurveTo(78, 185, 79, 248, 76, 284);
+        ctx.bezierCurveTo(73, 313, 56, 329, 43, 354);
+        ctx.lineTo(43, 476);
+        ctx.moveTo(289, 127);
+        ctx.bezierCurveTo(297, 185, 297, 245, 294, 286);
+        ctx.bezierCurveTo(292, 303, 307, 310, 368, 315);
+        ctx.moveTo(76, 292);
+        ctx.bezierCurveTo(139, 286, 232, 286, 294, 293);
+        ctx.moveTo(70, 463);
+        ctx.bezierCurveTo(143, 450, 187, 420, 226, 412);
+        ctx.bezierCurveTo(267, 402, 310, 390, 368, 366);
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(238, 244, 250, .07)';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([5, 7]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Open-air theater, including the horseshoe-shaped seating tiers.
+        ctx.fillStyle = 'rgba(76, 106, 142, .27)';
+        ctx.beginPath();
+        ctx.ellipse(129, 65, 111, 61, 0, Math.PI, Math.PI * 2);
+        ctx.lineTo(240, 104);
+        ctx.lineTo(197, 110);
+        ctx.lineTo(177, 92);
+        ctx.lineTo(79, 92);
+        ctx.lineTo(61, 110);
+        ctx.lineTo(18, 104);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(204, 220, 235, .24)';
+        ctx.lineWidth = 2;
+        for (let ring = 0; ring < 6; ring += 1) {
+          ctx.beginPath();
+          ctx.ellipse(129, 65, 101 - ring * 9, 53 - ring * 5, 0, Math.PI, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(226, 238, 248, .88)';
+        ctx.textAlign = 'center';
+        ctx.font = '700 12px Arial, sans-serif';
+        ctx.fillText('노천극장', 129, 81);
+        ctx.font = '500 8px Arial, sans-serif';
+        ctx.fillStyle = 'rgba(207, 225, 240, .58)';
+        ctx.fillText('209동', 129, 93);
+
+        const campusBuildings = [
+          {
+            points: [{ x: 285, y: 17 }, { x: 350, y: 17 }, { x: 350, y: 104 }, { x: 323, y: 104 }, { x: 320, y: 67 }, { x: 286, y: 62 }],
+            label: '제2공학관', sub: '211동', tx: 320, ty: 49,
+          },
+          {
+            points: [{ x: 13, y: 147 }, { x: 65, y: 147 }, { x: 70, y: 194 }, { x: 61, y: 250 }, { x: 17, y: 263 }, { x: 10, y: 221 }],
+            label: '박물관', sub: '109동', tx: 40, ty: 202,
+          },
+          {
+            points: [{ x: 315, y: 146 }, { x: 360, y: 139 }, { x: 360, y: 291 }, { x: 320, y: 286 }, { x: 311, y: 225 }],
+            label: '공업센터', sub: '206동', tx: 337, ty: 217,
+          },
+          {
+            points: [{ x: 84, y: 318 }, { x: 118, y: 310 }, { x: 118, y: 299 }, { x: 225, y: 299 }, { x: 225, y: 307 }, { x: 287, y: 320 }, { x: 281, y: 366 }, { x: 94, y: 366 }],
+            label: '신소재공학관', sub: '204동', tx: 185, ty: 337,
+          },
+          {
+            points: [{ x: 79, y: 385 }, { x: 143, y: 379 }, { x: 183, y: 393 }, { x: 199, y: 430 }, { x: 166, y: 451 }, { x: 102, y: 449 }, { x: 78, y: 424 }],
+            label: '과학기술관', sub: '203동', tx: 138, ty: 415,
+          },
+          {
+            points: [{ x: 10, y: 389 }, { x: 68, y: 386 }, { x: 70, y: 460 }, { x: 13, y: 465 }],
+            label: '건축관', sub: '202동', tx: 41, ty: 425,
+          },
+        ];
+
+        campusBuildings.forEach((building) => {
+          ctx.fillStyle = 'rgba(91, 120, 155, .3)';
+          ctx.strokeStyle = 'rgba(194, 211, 229, .23)';
+          ctx.lineWidth = 1;
+          drawPolygon(ctx, building.points);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(232, 241, 249, .83)';
+          ctx.font = '600 8.5px Arial, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(building.label, building.tx, building.ty);
+          ctx.fillStyle = 'rgba(203, 220, 237, .55)';
+          ctx.font = '500 7.5px Arial, sans-serif';
+          ctx.fillText(building.sub, building.tx, building.ty + 11);
+        });
+
+        ctx.fillStyle = 'rgba(52, 82, 119, .3)';
+        ctx.strokeStyle = 'rgba(190, 208, 226, .16)';
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, 91, 144, 192, 140, 7);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(222, 234, 244, .3)';
+        ctx.font = '700 9px Arial, sans-serif';
+        ctx.fillText('P', 187, 218);
+
+        // Small landscape pockets visible around the southern buildings.
+        ctx.fillStyle = 'rgba(43, 95, 115, .18)';
+        ctx.beginPath();
+        ctx.ellipse(236, 391, 39, 15, -.25, 0, Math.PI * 2);
+        ctx.fill();
       } else {
+        ctx.strokeStyle = 'rgba(205, 218, 233, .1)';
+        ctx.lineWidth = 17;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
         ctx.moveTo(0, 118);
         ctx.bezierCurveTo(98, 128, 232, 111, 360, 120);
         ctx.moveTo(88, 98);
@@ -177,79 +297,67 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
         ctx.bezierCurveTo(149, 244, 145, 350, 132, 470);
         ctx.moveTo(342, 118);
         ctx.lineTo(342, 343);
-      }
-      ctx.stroke();
-
-      ctx.fillStyle = 'rgba(98, 126, 164, .18)';
-      ctx.beginPath();
-      const stadiumX = isWristbandOne ? 133 : 180;
-      const stadiumY = isWristbandOne ? 61 : 61;
-      ctx.ellipse(stadiumX, stadiumY, isWristbandOne ? 91 : 76, 49, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
-      ctx.lineWidth = 3;
-      for (let ring = 0; ring < 4; ring += 1) {
-        ctx.beginPath();
-        ctx.ellipse(stadiumX, stadiumY, (isWristbandOne ? 82 : 67) - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
         ctx.stroke();
-      }
-      ctx.fillStyle = 'rgba(225, 239, 250, .82)';
-      ctx.textAlign = 'center';
-      ctx.font = '700 12px Arial, sans-serif';
-      ctx.fillText('노천극장', stadiumX, stadiumY + 1);
-      ctx.font = '500 9px Arial, sans-serif';
-      ctx.fillText('209동', stadiumX, stadiumY + 15);
 
-      const buildings = isWristbandOne ? [
-        { x: 278, y: 20, w: 76, h: 83, label: '제2공학관', sub: '211동' },
-        { x: 11, y: 153, w: 61, h: 108, label: '박물관', sub: '109동' },
-        { x: 307, y: 151, w: 48, h: 133, label: '공업센터', sub: '206동' },
-        { x: 99, y: 309, w: 191, h: 60, label: '신소재공학관', sub: '204동' },
-        { x: 88, y: 388, w: 111, h: 64, label: '과학기술관', sub: '203동' },
-        { x: 17, y: 392, w: 57, h: 68, label: '건축관', sub: '202동' },
-      ] : [
+        ctx.fillStyle = 'rgba(98, 126, 164, .18)';
+        ctx.beginPath();
+        ctx.ellipse(180, 61, 76, 49, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
+        ctx.lineWidth = 3;
+        for (let ring = 0; ring < 4; ring += 1) {
+          ctx.beginPath();
+          ctx.ellipse(180, 61, 67 - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
+          ctx.stroke();
+        }
+        ctx.fillStyle = 'rgba(225, 239, 250, .82)';
+        ctx.textAlign = 'center';
+        ctx.font = '700 12px Arial, sans-serif';
+        ctx.fillText('노천극장', 180, 62);
+        ctx.font = '500 9px Arial, sans-serif';
+        ctx.fillText('209동', 180, 77);
+
+        const buildings = [
         { x: 12, y: 25, w: 54, h: 72, label: '역사관', sub: '구본관' },
         { x: 8, y: 151, w: 60, h: 76, label: '국제관', sub: '108동' },
         { x: 101, y: 151, w: 37, h: 98, label: '박물관', sub: '109동' },
         { x: 14, y: 279, w: 55, h: 62, label: '토건관', sub: '' },
         { x: 164, y: 330, w: 165, h: 57, label: '신소재공학관', sub: '204동' },
         { x: 176, y: 412, w: 127, h: 46, label: '과학기술관', sub: '203동' },
-      ];
+        ];
 
-      buildings.forEach((building) => {
-        ctx.fillStyle = 'rgba(92, 119, 154, .24)';
-        ctx.strokeStyle = 'rgba(186, 203, 222, .19)';
-        ctx.lineWidth = 1;
-        drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
+        buildings.forEach((building) => {
+          ctx.fillStyle = 'rgba(92, 119, 154, .24)';
+          ctx.strokeStyle = 'rgba(186, 203, 222, .19)';
+          ctx.lineWidth = 1;
+          drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(230, 241, 250, .78)';
+          ctx.textAlign = 'center';
+          ctx.font = '600 9px Arial, sans-serif';
+          ctx.fillText(building.label, building.x + building.w / 2, building.y + building.h / 2 - (building.sub ? 2 : -3));
+          if (building.sub) {
+            ctx.fillStyle = 'rgba(207, 225, 240, .52)';
+            ctx.font = '500 8px Arial, sans-serif';
+            ctx.fillText(building.sub, building.x + building.w / 2, building.y + building.h / 2 + 10);
+          }
+        });
+
+        ctx.fillStyle = 'rgba(60, 87, 127, .24)';
+        ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
+        drawRoundedRect(ctx, 164, 130, 165, 169, 5);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = 'rgba(230, 241, 250, .78)';
-        ctx.textAlign = 'center';
-        ctx.font = '600 9px Arial, sans-serif';
-        ctx.fillText(building.label, building.x + building.w / 2, building.y + building.h / 2 - (building.sub ? 2 : -3));
-        if (building.sub) {
-          ctx.fillStyle = 'rgba(207, 225, 240, .52)';
-          ctx.font = '500 8px Arial, sans-serif';
-          ctx.fillText(building.sub, building.x + building.w / 2, building.y + building.h / 2 + 10);
-        }
-      });
-
-      ctx.fillStyle = 'rgba(60, 87, 127, .24)';
-      ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
-      const parking = isWristbandOne
-        ? { x: 98, y: 145, w: 181, h: 137 }
-        : { x: 164, y: 130, w: 165, h: 169 };
-      drawRoundedRect(ctx, parking.x, parking.y, parking.w, parking.h, 5);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = 'rgba(216, 231, 244, .34)';
-      ctx.font = '700 9px Arial, sans-serif';
-      ctx.fillText('주차장', parking.x + parking.w / 2, parking.y + parking.h / 2);
+        ctx.fillStyle = 'rgba(216, 231, 244, .34)';
+        ctx.font = '700 9px Arial, sans-serif';
+        ctx.fillText('주차장', 246, 215);
+      }
 
       const routes = isWristbandOne
         ? [
-            { x: 200, y: 142 }, { x: 282, y: 142 }, { x: 282, y: 286 },
-            { x: 103, y: 286 }, { x: 62, y: 302 }, { x: 39, y: 350 }, { x: 39, y: 455 },
+            { x: 198, y: 141 }, { x: 286, y: 141 }, { x: 286, y: 290 },
+            { x: 103, y: 290 }, { x: 63, y: 304 }, { x: 40, y: 350 }, { x: 40, y: 456 },
           ]
         : category === 'wristband'
         ? [
