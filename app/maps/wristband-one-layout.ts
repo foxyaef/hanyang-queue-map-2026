@@ -2,6 +2,25 @@
 // 도로와 건물은 독립 데이터입니다. 동선을 바꾸기 위해 도로를 이동하지 마세요.
 export type MapPoint = readonly [number, number];
 
+// 건물의 작은 굴곡 대신 일정한 반경의 모서리를 사용합니다.
+// 반환된 외곽은 화면 표시와 도로 겹침 검사에서 함께 사용합니다.
+export function softenCorners(points: readonly MapPoint[], radius = 12): MapPoint[] {
+  return points.flatMap((point, index) => {
+    const prev = points[(index + points.length - 1) % points.length];
+    const next = points[(index + 1) % points.length];
+    const before = Math.hypot(prev[0] - point[0], prev[1] - point[1]);
+    const after = Math.hypot(next[0] - point[0], next[1] - point[1]);
+    const inset = Math.min(radius, before / 2, after / 2);
+    const start = point.map((coordinate, axis) => coordinate + (prev[axis] - coordinate) * inset / before);
+    const end = point.map((coordinate, axis) => coordinate + (next[axis] - coordinate) * inset / after);
+    return Array.from({ length: 9 }, (_, i): MapPoint => {
+      const t = i / 8;
+      return [(1 - t) ** 2 * start[0] + 2 * (1 - t) * t * point[0] + t ** 2 * end[0],
+        (1 - t) ** 2 * start[1] + 2 * (1 - t) * t * point[1] + t ** 2 * end[1]];
+    });
+  });
+}
+
 export function curve(start: MapPoint, a: MapPoint, b: MapPoint, end: MapPoint, steps = 32): MapPoint[] {
   return Array.from({ length: steps + 1 }, (_, index) => {
     const t = index / steps;
@@ -51,34 +70,38 @@ export const MAP_ROADS: { id: string; width: number; points: MapPoint[] }[] = [
   ] },
 ];
 
-export const MAP_BUILDINGS: {
+const BUILDING_FOOTPRINTS: {
   id: string; name: string; number: string; points: MapPoint[];
   label: MapPoint; lines: string[]; small?: boolean;
 }[] = [
   { id: 'future-auto', name: '미래자동차 연구센터', number: '210동',
     points: [[135, -15], [506, -15], [506, 91], [135, 91]], label: [320, 38], lines: ['미래자동차 연구센터'], small: true },
   { id: 'engineering-2', name: '제2공학관', number: '211동',
-    points: [[644, 20], [790, 20], [790, 68], [863, 68], [872, 133], [916, 133], [932, 430], [814, 440], [797, 154], [727, 161], [632, 151], [627, 106], [646, 106]],
+    points: [[637, 20], [863, 20], [932, 430], [814, 440], [797, 155], [632, 155]],
     label: [865, 250], lines: ['제2', '공학관'] },
   { id: 'museum', name: '박물관', number: '109동',
-    points: [[108, 711], [219, 711], [219, 738], [231, 738], [231, 791], [221, 791], [221, 848], [233, 848], [233, 912], [219, 912], [219, 947], [108, 947]],
+    points: [[108, 711], [226, 711], [226, 947], [108, 947]],
     label: [169, 820], lines: ['박물관'] },
   { id: 'industrial-center', name: '공업센터본관', number: '206동',
-    points: [[877, 570], [1040, 555], [1064, 1030], [1040, 1030], [1035, 1009], [920, 1019]],
+    points: [[877, 570], [1040, 555], [1064, 1019], [920, 1019]],
     label: [970, 790], lines: ['공업센터', '본관'] },
   { id: 'materials', name: '신소재공학관', number: '204동',
-    points: [[298, 1080], [655, 1080], [655, 1131], [698, 1131], [698, 1150], [900, 1150], [906, 1212], [812, 1212], [812, 1266], [521, 1266], [521, 1200], [253, 1200], [253, 1133], [298, 1133]],
+    points: [[283, 1093], [655, 1093], [655, 1143], [890, 1143], [890, 1248], [521, 1248], [521, 1197], [283, 1197]],
     label: [575, 1168], lines: ['신소재공학관'] },
   { id: 'science', name: '과학기술관', number: '203동',
-    points: [[255, 1310], [362, 1310], [362, 1325], [408, 1325], [408, 1342], [442, 1342], [550, 1478], [443, 1542], [359, 1433], [254, 1433], [254, 1390], [204, 1390], [204, 1351], [254, 1351]],
+    points: [[252, 1315], [427, 1340], [548, 1480], [442, 1540], [363, 1430], [252, 1430]],
     label: [370, 1399], lines: ['과학기술관'] },
   { id: 'architecture', name: '건축관', number: '202동',
-    points: [[195, 1457], [257, 1457], [257, 1525], [284, 1525], [297, 1590], [195, 1590]],
+    points: [[195, 1457], [263, 1457], [297, 1590], [195, 1590]],
     label: [248, 1515], lines: ['건축관'], small: true },
   { id: 'civil', name: '재성토목관', number: '201동',
     points: [[-20, 1310], [90, 1310], [105, 1580], [-20, 1580]],
     label: [43, 1450], lines: ['재성', '토목관'], small: true },
 ];
+
+export const MAP_BUILDINGS = BUILDING_FOOTPRINTS.map((building) => ({
+  ...building, points: softenCorners(building.points),
+}));
 
 function seatingArc(rx: number, ry: number): MapPoint[] {
   return Array.from({ length: 49 }, (_, i) => {
@@ -88,9 +111,9 @@ function seatingArc(rx: number, ry: number): MapPoint[] {
 }
 
 export const THEATER_SEATING = [...seatingArc(268, 298), ...seatingArc(151, 178).reverse()];
-export const THEATER_TIERS = Array.from({ length: 8 }, (_, i) => seatingArc(160 + i * 14, 188 + i * 14));
-export const THEATER_EAST_STAND: MapPoint[] = [[630, 387], [748, 387], [748, 465], [693, 555], [504, 555], [504, 512]];
-export const THEATER_STAGE: MapPoint[] = [[263, 467], [294, 444], [410, 444], [438, 467], [424, 507], [479, 507], [479, 534], [431, 534], [411, 560], [285, 560], [274, 534], [238, 534], [238, 507], [276, 507]];
+export const THEATER_TIERS = Array.from({ length: 5 }, (_, i) => seatingArc(167 + i * 21, 194 + i * 22));
+export const THEATER_EAST_STAND = softenCorners([[630, 387], [748, 387], [748, 465], [693, 555], [504, 555], [504, 512]]);
+export const THEATER_STAGE = softenCorners([[289, 444], [414, 444], [459, 484], [428, 560], [278, 560], [247, 484]]);
 
 // 동선 수정 위치: 첫 점은 팔찌 부스(수령 시작점), 마지막 점은 최대 대기 지점.
 // 초록/청록색으로 표시해주신 구간을 하나의 연속 동선으로 옮겼습니다.

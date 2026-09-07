@@ -488,8 +488,8 @@ button:focus-visible { outline: 3px solid rgba(71, 193, 222, .65); outline-offse
   --map-land: #0c192b;
   --map-road: #35465b;
   --map-road-edge: #526175;
-  --map-building: #192c45;
-  --map-building-edge: #4b627e;
+  --map-building: #1d334e;
+  --map-building-edge: #59708b;
   --map-route: #bd90f0;
 }
 
@@ -1161,15 +1161,15 @@ button:focus-visible {
 .campus-parking-symbol { fill: #2d4560; stroke: #667e96; stroke-width: 2; }
 .campus-parking-p { fill: #d1dbe5; font-size: 39px; font-weight: 600; text-anchor: middle; }
 .campus-parking-label { fill: #9aaec2; font-size: 36px; text-anchor: middle; letter-spacing: 3px; }
-.campus-building-shapes { fill: var(--map-building); stroke: var(--map-building-edge); stroke-width: 3; stroke-linejoin: round; }
+.campus-building-shapes { fill: var(--map-building); stroke: var(--map-building-edge); stroke-width: 2.5; stroke-linejoin: round; }
 .campus-theater-tiers { stroke: #657c96; stroke-width: 2; opacity: .65; }
 .campus-building-label { fill: #e0e7ee; font-size: 37px; font-weight: 550; letter-spacing: -1.5px; }
 .campus-small-label { font-size: 33px; }
 .campus-building-number { fill: #9badc1; font-size: 32px; font-weight: 400; letter-spacing: 0; }
 .campus-theater-label { fill: #f3f1ec; font-size: 45px; font-weight: 650; }
-.campus-route-base { stroke: #101727; stroke-width: 21; }
-.campus-route-planned { stroke: #9c85b7; stroke-width: 10; stroke-dasharray: 2 21; }
-.campus-route-active { stroke: var(--map-route); stroke-width: 13; }
+.campus-route-base { stroke: #101727; stroke-width: 26; }
+.campus-route-planned { stroke: #9c85b7; stroke-width: 12; stroke-dasharray: 2 21; }
+.campus-route-active { stroke: var(--map-route); stroke-width: 18; }
 .campus-booth-halo { fill: #49335e; stroke: #ccb0ed; stroke-width: 2; }
 .campus-booth-dot { fill: #f3ecff; stroke: #ad7bdd; stroke-width: 7; }
 .campus-booth-plate { fill: #ede8f3; }

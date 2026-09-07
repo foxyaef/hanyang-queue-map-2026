@@ -43,7 +43,7 @@ export default function WristbandOneMap({ value, locationName, overlayText }: {
         </g>
         <g className="campus-theater-tiers" fill="none" aria-hidden="true">
           {THEATER_TIERS.map((tier, i) => <polyline key={i} points={pointsAttribute(tier)} />)}
-          <path d="M353 188V306 M163 276L246 359 M543 275L463 359 M523 521L736 441 M536 505L744 416 M514 538L721 469" />
+          <path d="M353 188V306 M163 276L246 359 M543 275L463 359 M523 521L736 441 M514 538L721 469" />
         </g>
         <g className="campus-labels" textAnchor="middle" aria-hidden="true">
           {MAP_BUILDINGS.map((building) => <text key={building.id} x={building.label[0]} y={building.label[1]}

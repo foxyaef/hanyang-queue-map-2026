@@ -58,7 +58,7 @@ assert.ok(Math.hypot(...filledRoute(WRISTBAND_ONE_ROUTE, 1000).at(-1).map((v, i)
 
 // 주차장 안쪽 시작 구간 이후에는 동선의 선 두께까지 실제 도로 안에 있어야 합니다.
 for (const p of WRISTBAND_ONE_ROUTE.filter((p) => p[0] >= 789 || p[1] >= 986)) {
-  const onRoad = MAP_ROADS.some((road) => road.points.slice(1).some((b, i) => pointToSegment(p, road.points[i], b) + 6.5 <= road.width / 2));
+  const onRoad = MAP_ROADS.some((road) => road.points.slice(1).some((b, i) => pointToSegment(p, road.points[i], b) + 9 <= road.width / 2));
   assert.ok(onRoad, `Queue leaves road at ${p}`);
 }
 console.log(`PASS: ${footprints.length} building footprints × ${MAP_ROADS.length} roads; minimum clearance ${clearance.toFixed(1)} units.`);
