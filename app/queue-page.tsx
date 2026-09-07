@@ -114,14 +114,7 @@ function drawRoundedRect(
   ctx.closePath();
 }
 
-function drawPolygon(ctx: CanvasRenderingContext2D, points: Array<{ x: number; y: number }>) {
-  ctx.beginPath();
-  ctx.moveTo(points[0].x, points[0].y);
-  points.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
-  ctx.closePath();
-}
-
-function QueueMap({ value, category, locationId, locationName, overlayText }: { value: number; category: CategoryId; locationId: string; locationName: string; overlayText?: string }) {
+function QueueMap({ value, category, locationName, overlayText }: { value: number; category: CategoryId; locationName: string; overlayText?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -143,7 +136,6 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
       ctx.clearRect(0, 0, width, height);
       ctx.save();
       ctx.scale(width / 360, height / 470);
-      const isWristbandOne = locationId === 'wristband-1';
 
       const background = ctx.createLinearGradient(0, 0, 360, 470);
       background.addColorStop(0, '#0b1a33');
@@ -160,218 +152,75 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
         ctx.stroke();
       }
 
-      if (isWristbandOne) {
-        // Reference-map faithful campus ground plane: roads are drawn first so
-        // every building remains clearly inside its own block.
-        ctx.fillStyle = 'rgba(31, 66, 103, .2)';
-        drawPolygon(ctx, [
-          { x: 0, y: 0 }, { x: 360, y: 0 }, { x: 360, y: 470 },
-          { x: 286, y: 470 }, { x: 253, y: 443 }, { x: 220, y: 422 },
-          { x: 171, y: 430 }, { x: 111, y: 457 }, { x: 0, y: 470 },
-        ]);
-        ctx.fill();
+      ctx.strokeStyle = 'rgba(205, 218, 233, .09)';
+      ctx.lineWidth = 17;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(0, 118);
+      ctx.bezierCurveTo(98, 128, 232, 111, 360, 120);
+      ctx.moveTo(88, 98);
+      ctx.bezierCurveTo(81, 190, 83, 312, 112, 470);
+      ctx.moveTo(151, 118);
+      ctx.bezierCurveTo(149, 244, 145, 350, 132, 470);
+      ctx.moveTo(342, 118);
+      ctx.lineTo(342, 343);
+      ctx.stroke();
 
-        // Complete road network. The widest corridor is the actual queue route,
-        // so visitors can recognize every turn before reading the purple line.
-        ctx.strokeStyle = 'rgba(226, 236, 246, .13)';
-        ctx.lineWidth = 22;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+      ctx.fillStyle = 'rgba(98, 126, 164, .18)';
+      ctx.beginPath();
+      ctx.ellipse(180, 61, 76, 49, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
+      ctx.lineWidth = 3;
+      for (let ring = 0; ring < 4; ring += 1) {
         ctx.beginPath();
-        ctx.moveTo(-8, 139);
-        ctx.bezierCurveTo(74, 143, 111, 137, 198, 141);
-        ctx.moveTo(286, 141);
-        ctx.bezierCurveTo(318, 142, 343, 137, 368, 126);
-        ctx.moveTo(75, 139);
-        ctx.bezierCurveTo(76, 190, 74, 244, 69, 275);
-        ctx.moveTo(286, 290);
-        ctx.bezierCurveTo(313, 303, 337, 307, 368, 307);
-        ctx.moveTo(52, 478);
-        ctx.bezierCurveTo(132, 471, 175, 440, 226, 424);
-        ctx.bezierCurveTo(281, 407, 325, 389, 368, 366);
+        ctx.ellipse(180, 61, 67 - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
         ctx.stroke();
+      }
+      ctx.fillStyle = 'rgba(225, 239, 250, .82)';
+      ctx.textAlign = 'center';
+      ctx.font = '700 12px Arial, sans-serif';
+      ctx.fillText('노천극장', 180, 62);
+      ctx.font = '500 9px Arial, sans-serif';
+      ctx.fillText('209동', 180, 76);
 
-        const queueRoad = [
-          { x: 198, y: 141 }, { x: 286, y: 141 }, { x: 286, y: 290 },
-          { x: 103, y: 290 }, { x: 63, y: 304 }, { x: 40, y: 350 }, { x: 40, y: 476 },
-        ];
-        ctx.strokeStyle = 'rgba(190, 210, 230, .2)';
-        ctx.lineWidth = 34;
-        ctx.beginPath();
-        ctx.moveTo(queueRoad[0].x, queueRoad[0].y);
-        queueRoad.slice(1).forEach((point) => ctx.lineTo(point.x, point.y));
-        ctx.stroke();
-        ctx.strokeStyle = 'rgba(235, 242, 249, .13)';
-        ctx.lineWidth = 27;
-        ctx.stroke();
-
-        ctx.strokeStyle = 'rgba(238, 244, 250, .075)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 7]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Open-air theater, including the horseshoe-shaped seating tiers.
-        ctx.fillStyle = 'rgba(76, 106, 142, .27)';
-        ctx.beginPath();
-        ctx.ellipse(129, 65, 111, 61, 0, Math.PI, Math.PI * 2);
-        ctx.lineTo(240, 104);
-        ctx.lineTo(197, 110);
-        ctx.lineTo(177, 92);
-        ctx.lineTo(79, 92);
-        ctx.lineTo(61, 110);
-        ctx.lineTo(18, 104);
-        ctx.closePath();
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(204, 220, 235, .24)';
-        ctx.lineWidth = 2;
-        for (let ring = 0; ring < 6; ring += 1) {
-          ctx.beginPath();
-          ctx.ellipse(129, 65, 101 - ring * 9, 53 - ring * 5, 0, Math.PI, Math.PI * 2);
-          ctx.stroke();
-        }
-        ctx.fillStyle = 'rgba(226, 238, 248, .88)';
-        ctx.textAlign = 'center';
-        ctx.font = '700 12px Arial, sans-serif';
-        ctx.fillText('노천극장', 129, 81);
-        ctx.font = '500 8px Arial, sans-serif';
-        ctx.fillStyle = 'rgba(207, 225, 240, .58)';
-        ctx.fillText('209동', 129, 93);
-
-        const campusBuildings = [
-          {
-            points: [{ x: 302, y: 18 }, { x: 352, y: 18 }, { x: 352, y: 105 }, { x: 318, y: 105 }, { x: 316, y: 64 }, { x: 302, y: 61 }],
-            label: '제2공학관', sub: '211동', tx: 328, ty: 50,
-          },
-          {
-            points: [{ x: 9, y: 169 }, { x: 61, y: 169 }, { x: 64, y: 207 }, { x: 58, y: 254 }, { x: 14, y: 263 }, { x: 9, y: 224 }],
-            label: '박물관', sub: '109동', tx: 36, ty: 211,
-          },
-          {
-            points: [{ x: 313, y: 161 }, { x: 360, y: 153 }, { x: 360, y: 286 }, { x: 316, y: 280 }, { x: 309, y: 221 }],
-            label: '공업센터', sub: '206동', tx: 337, ty: 218,
-          },
-          {
-            points: [{ x: 91, y: 322 }, { x: 119, y: 315 }, { x: 226, y: 315 }, { x: 226, y: 321 }, { x: 273, y: 331 }, { x: 268, y: 367 }, { x: 96, y: 367 }],
-            label: '신소재공학관', sub: '204동', tx: 181, ty: 341,
-          },
-          {
-            points: [{ x: 116, y: 392 }, { x: 158, y: 387 }, { x: 188, y: 399 }, { x: 198, y: 429 }, { x: 171, y: 448 }, { x: 121, y: 446 }, { x: 109, y: 421 }],
-            label: '과학기술관', sub: '203동', tx: 155, ty: 416,
-          },
-          {
-            points: [{ x: 60, y: 388 }, { x: 103, y: 388 }, { x: 105, y: 458 }, { x: 59, y: 461 }],
-            label: '건축관', sub: '202동', tx: 82, ty: 423,
-          },
-        ];
-
-        campusBuildings.forEach((building) => {
-          ctx.fillStyle = 'rgba(91, 120, 155, .3)';
-          ctx.strokeStyle = 'rgba(194, 211, 229, .23)';
-          ctx.lineWidth = 1;
-          drawPolygon(ctx, building.points);
-          ctx.fill();
-          ctx.stroke();
-          ctx.fillStyle = 'rgba(232, 241, 249, .83)';
-          ctx.font = '600 8.5px Arial, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(building.label, building.tx, building.ty);
-          ctx.fillStyle = 'rgba(203, 220, 237, .55)';
-          ctx.font = '500 7.5px Arial, sans-serif';
-          ctx.fillText(building.sub, building.tx, building.ty + 11);
-        });
-
-        ctx.fillStyle = 'rgba(52, 82, 119, .3)';
-        ctx.strokeStyle = 'rgba(190, 208, 226, .16)';
-        ctx.lineWidth = 1;
-        drawRoundedRect(ctx, 94, 158, 174, 117, 7);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = 'rgba(222, 234, 244, .3)';
-        ctx.font = '700 9px Arial, sans-serif';
-        ctx.fillText('P', 181, 220);
-
-        // Small landscape pockets visible around the southern buildings.
-        ctx.fillStyle = 'rgba(43, 95, 115, .18)';
-        ctx.beginPath();
-        ctx.ellipse(236, 391, 39, 15, -.25, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        ctx.strokeStyle = 'rgba(205, 218, 233, .1)';
-        ctx.lineWidth = 17;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(0, 118);
-        ctx.bezierCurveTo(98, 128, 232, 111, 360, 120);
-        ctx.moveTo(88, 98);
-        ctx.bezierCurveTo(81, 190, 83, 312, 112, 470);
-        ctx.moveTo(151, 118);
-        ctx.bezierCurveTo(149, 244, 145, 350, 132, 470);
-        ctx.moveTo(342, 118);
-        ctx.lineTo(342, 343);
-        ctx.stroke();
-
-        ctx.fillStyle = 'rgba(98, 126, 164, .18)';
-        ctx.beginPath();
-        ctx.ellipse(180, 61, 76, 49, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(205, 226, 241, .2)';
-        ctx.lineWidth = 3;
-        for (let ring = 0; ring < 4; ring += 1) {
-          ctx.beginPath();
-          ctx.ellipse(180, 61, 67 - ring * 8, 42 - ring * 5, 0, Math.PI, Math.PI * 2);
-          ctx.stroke();
-        }
-        ctx.fillStyle = 'rgba(225, 239, 250, .82)';
-        ctx.textAlign = 'center';
-        ctx.font = '700 12px Arial, sans-serif';
-        ctx.fillText('노천극장', 180, 62);
-        ctx.font = '500 9px Arial, sans-serif';
-        ctx.fillText('209동', 180, 77);
-
-        const buildings = [
+      const buildings = [
         { x: 12, y: 25, w: 54, h: 72, label: '역사관', sub: '구본관' },
         { x: 8, y: 151, w: 60, h: 76, label: '국제관', sub: '108동' },
         { x: 101, y: 151, w: 37, h: 98, label: '박물관', sub: '109동' },
         { x: 14, y: 279, w: 55, h: 62, label: '토건관', sub: '' },
         { x: 164, y: 330, w: 165, h: 57, label: '신소재공학관', sub: '204동' },
         { x: 176, y: 412, w: 127, h: 46, label: '과학기술관', sub: '203동' },
-        ];
+      ];
 
-        buildings.forEach((building) => {
-          ctx.fillStyle = 'rgba(92, 119, 154, .24)';
-          ctx.strokeStyle = 'rgba(186, 203, 222, .19)';
-          ctx.lineWidth = 1;
-          drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
-          ctx.fill();
-          ctx.stroke();
-          ctx.fillStyle = 'rgba(230, 241, 250, .78)';
-          ctx.textAlign = 'center';
-          ctx.font = '600 9px Arial, sans-serif';
-          ctx.fillText(building.label, building.x + building.w / 2, building.y + building.h / 2 - (building.sub ? 2 : -3));
-          if (building.sub) {
-            ctx.fillStyle = 'rgba(207, 225, 240, .52)';
-            ctx.font = '500 8px Arial, sans-serif';
-            ctx.fillText(building.sub, building.x + building.w / 2, building.y + building.h / 2 + 10);
-          }
-        });
-
-        ctx.fillStyle = 'rgba(60, 87, 127, .24)';
-        ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
-        drawRoundedRect(ctx, 164, 130, 165, 169, 5);
+      buildings.forEach((building) => {
+        ctx.fillStyle = 'rgba(92, 119, 154, .24)';
+        ctx.strokeStyle = 'rgba(186, 203, 222, .19)';
+        ctx.lineWidth = 1;
+        drawRoundedRect(ctx, building.x, building.y, building.w, building.h, 4);
         ctx.fill();
         ctx.stroke();
-        ctx.fillStyle = 'rgba(216, 231, 244, .34)';
-        ctx.font = '700 9px Arial, sans-serif';
-        ctx.fillText('주차장', 246, 215);
-      }
+        ctx.fillStyle = 'rgba(230, 241, 250, .78)';
+        ctx.textAlign = 'center';
+        ctx.font = '600 9px Arial, sans-serif';
+        ctx.fillText(building.label, building.x + building.w / 2, building.y + building.h / 2 - (building.sub ? 2 : -3));
+        if (building.sub) {
+          ctx.fillStyle = 'rgba(207, 225, 240, .52)';
+          ctx.font = '500 8px Arial, sans-serif';
+          ctx.fillText(building.sub, building.x + building.w / 2, building.y + building.h / 2 + 10);
+        }
+      });
 
-      const routes = isWristbandOne
-        ? [
-            { x: 198, y: 141 }, { x: 286, y: 141 }, { x: 286, y: 290 },
-            { x: 103, y: 290 }, { x: 63, y: 304 }, { x: 40, y: 350 }, { x: 40, y: 456 },
-          ]
-        : category === 'wristband'
+      ctx.fillStyle = 'rgba(60, 87, 127, .24)';
+      ctx.strokeStyle = 'rgba(177, 196, 218, .14)';
+      drawRoundedRect(ctx, 164, 130, 165, 169, 5);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(216, 231, 244, .34)';
+      ctx.font = '700 9px Arial, sans-serif';
+      ctx.fillText('주차장', 247, 218);
+
+      const routes = category === 'wristband'
         ? [
             { x: 205, y: 128 }, { x: 205, y: 154 }, { x: 250, y: 154 }, { x: 250, y: 128 },
             { x: 330, y: 128 }, { x: 330, y: 292 }, { x: 160, y: 292 }, { x: 160, y: 202 },
@@ -435,34 +284,13 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
       }
 
       const entry = routes[0];
-      if (isWristbandOne) {
-        ctx.fillStyle = color;
-        ctx.shadowColor = 'rgba(155, 87, 230, .72)';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(entry.x, entry.y, 12, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#f7fbff';
-        ctx.beginPath();
-        ctx.arc(entry.x, entry.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#f7fbff';
-        drawRoundedRect(ctx, entry.x - 32, entry.y - 34, 64, 18, 3);
-        ctx.fill();
-        ctx.fillStyle = '#0d244c';
-        ctx.font = '700 9px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('팔찌 부스 1', entry.x, entry.y - 22);
-      } else {
-        ctx.fillStyle = '#f7fbff';
-        drawRoundedRect(ctx, entry.x - 24, entry.y - 14, 48, 28, 14);
-        ctx.fill();
-        ctx.fillStyle = '#0d244c';
-        ctx.font = '700 10px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(category === 'wristband' ? '수령' : '입장', entry.x, entry.y + 4);
-      }
+      ctx.fillStyle = '#f7fbff';
+      drawRoundedRect(ctx, entry.x - 24, entry.y - 14, 48, 28, 14);
+      ctx.fill();
+      ctx.fillStyle = '#0d244c';
+      ctx.font = '700 10px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(category === 'wristband' ? '수령' : '입장', entry.x, entry.y + 4);
 
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -480,7 +308,7 @@ function QueueMap({ value, category, locationId, locationName, overlayText }: { 
     const observer = new ResizeObserver(drawMap);
     observer.observe(currentCanvas);
     return () => observer.disconnect();
-  }, [category, locationId, value]);
+  }, [category, value]);
 
   return (
     <div className="map-canvas-wrap" role="img" aria-label={`${locationName}의 현재 대기 동선`}>
@@ -673,7 +501,6 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
             <QueueMap
               value={selected.queueValue}
               category={category}
-              locationId={selected.id}
               locationName={selected.name}
               overlayText={!adminMode && !isLoading && !status.showQueue ? status.short : undefined}
             />
