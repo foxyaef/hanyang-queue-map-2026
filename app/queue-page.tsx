@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { QUEUE_STATUS_THRESHOLDS } from './queue-config';
 
 type CategoryId = 'wristband' | 'entrance';
 
@@ -55,9 +56,9 @@ function queueStatus(queue: QueueItem, serverTime: string) {
     if (now >= end) return { label: '오늘 운영이 종료되었습니다', short: '운영 종료', tone: 'closed', showQueue: false };
   }
 
-  if (queue.queueValue >= 750) return { label: '대기 매우 많음', short: '매우 많음', tone: 'busy', showQueue: true };
-  if (queue.queueValue >= 500) return { label: '대기 많음', short: '많음', tone: 'high', showQueue: true };
-  if (queue.queueValue >= 250) return { label: '대기 보통', short: '보통', tone: 'medium', showQueue: true };
+  if (queue.queueValue >= QUEUE_STATUS_THRESHOLDS.veryBusyFrom) return { label: '대기 매우 많음', short: '매우 많음', tone: 'busy', showQueue: true };
+  if (queue.queueValue >= QUEUE_STATUS_THRESHOLDS.busyFrom) return { label: '대기 많음', short: '많음', tone: 'high', showQueue: true };
+  if (queue.queueValue >= QUEUE_STATUS_THRESHOLDS.normalFrom) return { label: '대기 보통', short: '보통', tone: 'medium', showQueue: true };
   return { label: '대기 원활', short: '원활', tone: 'low', showQueue: true };
 }
 
@@ -310,7 +311,7 @@ function QueueMap({ value, category, locationName, overlayText }: { value: numbe
   }, [category, value]);
 
   return (
-    <div className="map-canvas-wrap" role="img" aria-label={`${locationName}의 현재 대기 동선, 전체 구간의 ${Math.round(value / 10)}퍼센트`}>
+    <div className="map-canvas-wrap" role="img" aria-label={`${locationName}의 현재 대기 동선`}>
       <canvas ref={canvasRef} className="queue-map" />
       <span className="map-place-label">한양대학교 서울캠퍼스</span>
       {overlayText && <div className="map-status-overlay"><strong>{overlayText}</strong><span>현재 대기 동선 표시가 중지되었습니다.</span></div>}
@@ -505,10 +506,6 @@ export default function QueuePage({ adminMode = false, adminToken = '', onSignOu
             />
 
             <div className={`queue-summary${adminMode ? ' admin-editing' : ''}`}>
-              <div>
-                <p>현재 줄 길이</p>
-                <strong>{adminMode || status.showQueue ? Math.round(selected.queueValue / 10) : '--'}<span>{adminMode || status.showQueue ? '%' : ''}</span></strong>
-              </div>
               {adminMode ? (
                 <input
                   className="queue-meter-slider"

@@ -368,7 +368,7 @@ button { font: inherit; }
 
 .queue-summary {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: 1fr auto;
   align-items: end;
   gap: 14px;
   padding: 17px 16px 18px;
@@ -376,9 +376,6 @@ button { font: inherit; }
 
 .queue-summary p,
 .queue-summary strong { margin: 0; }
-.queue-summary > div:first-child p { margin-bottom: 1px; color: #8390a3; font-size: 9px; }
-.queue-summary > div:first-child strong { color: #112953; font-size: 25px; font-weight: 900; letter-spacing: -.045em; }
-.queue-summary > div:first-child strong span { margin-left: 1px; color: #75859f; font-size: 12px; }
 
 .queue-meter {
   height: 5px;
@@ -764,22 +761,6 @@ body {
   border-top: 1px solid rgba(220, 228, 238, .09);
 }
 
-.queue-summary > div:first-child p {
-  color: rgba(185, 197, 213, .52);
-  font-size: 8px;
-}
-
-.queue-summary > div:first-child strong {
-  color: var(--festival-white);
-  font-family: var(--festival-serif);
-  font-size: 29px;
-  font-weight: 700;
-}
-
-.queue-summary > div:first-child strong span {
-  color: rgba(211, 218, 228, .55);
-}
-
 .queue-meter {
   border-radius: 0;
   background: rgba(223, 230, 238, .12);
@@ -1048,7 +1029,7 @@ button:focus-visible {
 }
 
 .queue-summary.admin-editing {
-  grid-template-columns: 60px 1fr auto;
+  grid-template-columns: 1fr auto;
 }
 
 .queue-meter-slider {
