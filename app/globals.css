@@ -485,6 +485,12 @@ button:focus-visible { outline: 3px solid rgba(71, 193, 222, .65); outline-offse
   --festival-muted: #8e9bad;
   --festival-serif: 'Iropke Batang', 'KoPub Batang', 'Noto Serif KR', 'AppleMyungjo', 'Batang', serif;
   --festival-sans: Pretendard, 'SUIT', 'Noto Sans KR', 'Apple SD Gothic Neo', Arial, sans-serif;
+  --map-land: #0c192b;
+  --map-road: #35465b;
+  --map-road-edge: #526175;
+  --map-building: #192c45;
+  --map-building-edge: #4b627e;
+  --map-route: #bd90f0;
 }
 
 body {
@@ -1142,3 +1148,37 @@ button:focus-visible {
   background: rgba(7, 18, 37, .5);
   cursor: default;
 }
+
+/* 팔찌 1 지도: 원본 비율을 유지해 도로와 건물이 화면 크기에 따라 뒤틀리지 않게 합니다. */
+.map-canvas-wrap.campus-map-wrap { aspect-ratio: auto; background: var(--map-land); }
+.campus-map { display: block; width: 100%; height: auto; font-family: var(--festival-sans); }
+.campus-ground { fill: var(--map-land); }
+.campus-landscape { fill: #15323b; }
+.campus-road { stroke: var(--map-road); }
+.campus-road-edge { stroke: var(--map-road-edge); }
+.campus-parking { fill: #112338; stroke: #354d65; stroke-width: 3; }
+.campus-parking-aisle { fill: none; stroke: #304156; stroke-width: 30; stroke-linejoin: round; }
+.campus-parking-symbol { fill: #2d4560; stroke: #667e96; stroke-width: 2; }
+.campus-parking-p { fill: #d1dbe5; font-size: 39px; font-weight: 600; text-anchor: middle; }
+.campus-parking-label { fill: #9aaec2; font-size: 36px; text-anchor: middle; letter-spacing: 3px; }
+.campus-building-shapes { fill: var(--map-building); stroke: var(--map-building-edge); stroke-width: 3; stroke-linejoin: round; }
+.campus-theater-tiers { stroke: #657c96; stroke-width: 2; opacity: .65; }
+.campus-building-label { fill: #e0e7ee; font-size: 37px; font-weight: 550; letter-spacing: -1.5px; }
+.campus-small-label { font-size: 33px; }
+.campus-building-number { fill: #9badc1; font-size: 32px; font-weight: 400; letter-spacing: 0; }
+.campus-theater-label { fill: #f3f1ec; font-size: 45px; font-weight: 650; }
+.campus-route-base { stroke: #101727; stroke-width: 21; }
+.campus-route-planned { stroke: #9c85b7; stroke-width: 10; stroke-dasharray: 2 21; }
+.campus-route-active { stroke: var(--map-route); stroke-width: 13; }
+.campus-booth-halo { fill: #49335e; stroke: #ccb0ed; stroke-width: 2; }
+.campus-booth-dot { fill: #f3ecff; stroke: #ad7bdd; stroke-width: 7; }
+.campus-booth-plate { fill: #ede8f3; }
+.campus-booth-label { fill: #241934; font-size: 32px; font-weight: 750; text-anchor: middle; }
+.campus-queue-end { fill: #f3ecff; stroke: #9866c9; stroke-width: 7; }
+.campus-map-key { display: grid; grid-template-columns: auto auto; justify-content: center; gap: 10px 24px; padding: 12px 8px; border-top: 1px solid #2e4055; color: #b8c5d4; font-size: 12px; }
+.campus-map-key span { display: inline-flex; align-items: center; gap: 6px; }
+.campus-map-key i { display: inline-block; width: 18px; height: 0; }
+.campus-key-active { border-top: 3px solid var(--map-route); }
+.campus-key-planned { border-top: 3px dotted #9c85b7; }
+.campus-map-key i.campus-key-end { width: 9px; height: 9px; margin-inline: 4.5px; border: 2px solid #9866c9; border-radius: 50%; background: #f3ecff; }
+.campus-map-key i.campus-key-road { height: 7px; border: 1px solid var(--map-road-edge); background: var(--map-road); }
