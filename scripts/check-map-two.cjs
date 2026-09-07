@@ -85,3 +85,13 @@ for (let i = 1; i < ENTRANCE_THREE_ROUTE.length; i++) {
   }
 }
 console.log('PASS: gate 3 grows continuously southwards at all 1001 values, separate from wristband 2.');
+let previousAngle;
+for (let i = 1; i < ENTRANCE_THREE_ROUTE.length; i++) {
+  const dx = ENTRANCE_THREE_ROUTE[i][0] - ENTRANCE_THREE_ROUTE[i - 1][0];
+  const dy = ENTRANCE_THREE_ROUTE[i][1] - ENTRANCE_THREE_ROUTE[i - 1][1];
+  assert.ok(dx >= 0 && dy > 0, 'Gate 3 should not wiggle back and forth');
+  const angle = Math.atan2(dy, dx);
+  if (previousAngle !== undefined) assert.ok(Math.abs(angle - previousAngle) < Math.PI / 180, 'Gate 3 should not kink');
+  previousAngle = angle;
+}
+console.log('PASS: gate 3 follows one smooth curve without sideways reversals or abrupt turns.');

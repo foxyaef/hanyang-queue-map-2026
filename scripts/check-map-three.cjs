@@ -100,11 +100,18 @@ for (const name of ['one', 'two', 'three']) {
   const markup = renderToStaticMarkup(React.createElement(Map, { value: 500, locationName: '수령처' }));
   assert.match(markup, /class="campus-booth-label">수령처<\/text>/);
   assert.doesNotMatch(markup, /팔찌 부스 [123] · 시작/);
+  assert.match(markup, /campus-map campus-wristband/);
+  const EntryMap = require(`../app/maps/entrance-${name}-map.tsx`).default;
+  const entryMarkup = renderToStaticMarkup(React.createElement(EntryMap, { value: 500, locationName: '입장문' }));
+  assert.match(entryMarkup, /campus-map campus-entrance/);
+  assert.doesNotMatch(entryMarkup, /campus-wristband/);
 }
 const EntranceMap = require('../app/maps/entrance-one-map.tsx').default;
 const entranceMarkup = renderToStaticMarkup(React.createElement(EntranceMap, { value: 500, locationName: '입장문 1', overlayText: '입장 마감' }));
 assert.match(entranceMarkup, /class="campus-booth-label">게이트<\/text>/);
 assert.match(entranceMarkup, /입장 마감/);
+assert.match(entranceMarkup, /백남학술정보관/);
+assert.match(entranceMarkup, /501동/);
 assert.doesNotMatch(entranceMarkup, /class="campus-booth-label">수령처/);
 const EntranceTwoMap = require('../app/maps/entrance-two-map.tsx').default;
 const entranceTwoMarkup = renderToStaticMarkup(React.createElement(EntranceTwoMap, { value: 500, locationName: '입장문 2', overlayText: '입장 마감' }));

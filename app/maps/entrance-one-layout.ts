@@ -22,7 +22,7 @@ export const ENTRANCE_ONE_ROADS = [
 export const ENTRANCE_ONE_BUILDINGS = THREE_BUILDINGS.map((building) => building.id === 'social-sciences'
   ? { ...building, points: softenCorners(projectThreePoints([[60, 573], [151, 617], [163, 897], [62, 897]])) }
   : building);
-// 참고 이미지에서 이름이 확인되지 않는 건물은 형태만 표시합니다.
+// 사용자 확인: 백남학술정보관 501동.
 export const ENTRANCE_ONE_NORTH_BUILDING = softenCorners(projectThreePoints([
   [393, 490], [663, 637], [616, 715], [353, 574],
 ]));

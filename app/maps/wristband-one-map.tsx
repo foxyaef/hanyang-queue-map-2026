@@ -15,8 +15,8 @@ export default function WristbandOneMap({ value, locationName, overlayText, entr
   const [endX, endY] = active[active.length - 1];
 
   return (
-    <div className="map-canvas-wrap campus-map-wrap">
-      <svg className="campus-map" viewBox={`${view.left} ${view.top} ${view.width} ${view.height}`} role="img"
+    <div className={`map-canvas-wrap campus-map-wrap ${entranceTwo ? 'campus-entrance' : 'campus-wristband'}`}>
+      <svg className={`campus-map ${entranceTwo ? 'campus-entrance' : 'campus-wristband'}`} viewBox={`${view.left} ${view.top} ${view.width} ${view.height}`} role="img"
         aria-label={entranceTwo
           ? `${locationName} 대기 지도. 노천극장과 미래자동차 연구센터 사이 오른쪽 게이트에서, 노천극장 위쪽의 굽은 도로를 따라 왼쪽 역사관 방향으로 줄이 이어집니다. 노천극장과 아래 주차장 중심 지도입니다.`
           : `${locationName} 대기 지도. 노천극장 아래 주차장 안쪽의 팔찌 부스에서 오른쪽으로 이동한 후, 주차장 동쪽과 남쪽을 따라 신소재공학관 서쪽까지 이어지는 대기 동선.`}>

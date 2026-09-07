@@ -23,10 +23,10 @@ export default function WristbandThreeMap({ value, locationName, overlayText, en
   const [parkingX, parkingY] = projectThree([785, 1722]);
 
   return (
-    <div className="map-canvas-wrap campus-map-wrap">
-      <svg className="campus-map" viewBox={`0 ${view.top} ${view.width} ${view.height}`} role="img"
+    <div className={`map-canvas-wrap campus-map-wrap ${entrance ? 'campus-entrance' : 'campus-wristband'}`}>
+      <svg className={`campus-map ${entrance ? 'campus-entrance' : 'campus-wristband'}`} viewBox={`0 ${view.top} ${view.width} ${view.height}`} role="img"
         aria-label={entrance
-          ? `${locationName} 대기 지도. 노천극장과 미래자동차 연구센터 사이의 게이트에서 북쪽으로 올라가 제1공학관 아래를 따라 동쪽으로 돌고, 아워홈 푸드코트 방향까지 이어집니다. 팔찌 대기줄과 나란한 구간은 도로 오른쪽을 사용합니다.`
+          ? `${locationName} 대기 지도. 노천극장과 미래자동차 연구센터 사이의 게이트에서 북쪽으로 올라가 제1공학관 아래를 따라 동쪽으로 돌고, 백남학술정보관 501동 옆을 지나 아워홈 푸드코트 방향까지 이어집니다. 팔찌 대기줄과 나란한 구간은 도로 오른쪽을 사용합니다.`
           : `${locationName} 대기 지도. 사회과학관 아래 수령처에서 본관 오른쪽으로 돌아 역사관 옆으로 이어집니다. 팔찌 줄은 역사관 쪽 도로 가장자리에 붙고, 오른쪽은 입장 대기 공간으로 남겨 둡니다.`}>
         <rect y={view.top} width={view.width} height={view.height} className="campus-ground" />
         <g className="campus-landscape" aria-hidden="true">
@@ -75,6 +75,11 @@ export default function WristbandThreeMap({ value, locationName, overlayText, en
           <text x={stationX} y={stationY - 94} className="campus-building-label">한양대역<tspan x={stationX} dy="39" className="campus-landmark-label">2번 출구</tspan></text>
           <text x={stationX} y={stationY + 88} className="campus-landmark-label">애지문</text>
           {entrance && <text x={projectThree([655, 415])[0]} y={projectThree([655, 415])[1]} className="campus-landmark-label">아워홈 푸드코트</text>}
+          {entrance && <text x={projectThree([510, 602])[0]} y={projectThree([510, 602])[1] - 9}
+            transform={`rotate(29 ${projectThree([510, 602])[0]} ${projectThree([510, 602])[1]})`}
+            className="campus-building-label campus-small-label">백남학술정보관
+            <tspan x={projectThree([510, 602])[0]} dy="42" className="campus-building-number">501동</tspan>
+          </text>}
         </g>
 
         <g fill="none" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

@@ -24,8 +24,8 @@ export default function WristbandTwoMap({ value, locationName, overlayText, entr
   const [statueX, statueY] = projectTwo([295, 535]);
 
   return (
-    <div className="map-canvas-wrap campus-map-wrap">
-      <svg className="campus-map" viewBox={`0 ${view.top} ${view.width} ${view.height}`} role="img"
+    <div className={`map-canvas-wrap campus-map-wrap ${entranceThree ? 'campus-entrance' : 'campus-wristband'}`}>
+      <svg className={`campus-map ${entranceThree ? 'campus-entrance' : 'campus-wristband'}`} viewBox={`0 ${view.top} ${view.width} ${view.height}`} role="img"
         aria-label={entranceThree
           ? `${locationName} 대기 지도. 노천극장 왼쪽 게이트에서 박물관 왼쪽을 따라 남쪽으로 내려가며, 토건관 건너편의 박물관 남서쪽까지 이어지는 연속 대기 동선입니다.`
           : `${locationName} 대기 지도. 국제관 옆 팔찌 부스에서 북쪽으로 올라갔다가 애지문 쪽에서 꺾입니다. 국제관 앞 통행 공간은 항상 비워 두며, 그 건너편에서 토건관 방향으로 줄이 이어집니다.`}>

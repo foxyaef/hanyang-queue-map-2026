@@ -1193,3 +1193,16 @@ button:focus-visible {
 .campus-passage-plate { fill: #142c32; stroke: #648f90; stroke-width: 2; }
 .campus-passage-label { fill: #c6e7df; font-size: 31px; font-weight: 600; text-anchor: middle; }
 .campus-passage-note { margin: 0; padding: 0 14px 14px; color: #b2c9c9; font-size: 12px; line-height: 1.65; text-align: center; }
+
+/* 대기 유형별 색상: 팔찌 수령은 초록색, 노천 입장은 기존 보라색을 유지합니다.
+   사용자/관리자 페이지의 지도, 시작점, 줄 끝과 범례에 함께 적용됩니다. */
+.campus-wristband .campus-route-active { stroke: #56d69a; }
+.campus-wristband .campus-route-planned { stroke: #6caa8b; }
+.campus-wristband .campus-booth-halo { fill: #214d3c; stroke: #9ee8bf; }
+.campus-wristband .campus-booth-dot { fill: #ebfff3; stroke: #39b77c; }
+.campus-wristband .campus-booth-plate { fill: #e5f5ec; }
+.campus-wristband .campus-booth-label { fill: #163b2a; }
+.campus-wristband .campus-queue-end { fill: #ebfff3; stroke: #39b77c; }
+.campus-wristband .campus-key-active { border-top-color: #56d69a; }
+.campus-wristband .campus-key-planned { border-top-color: #6caa8b; }
+.campus-wristband .campus-map-key i.campus-key-end { border-color: #39b77c; background: #ebfff3; }
